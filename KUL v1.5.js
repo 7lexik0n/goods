@@ -171,7 +171,7 @@
                         if (el.gift[num].children[0].alt) {
                             var name = el.gift[num].children[0].src.slice(24,-4)
                             var val = el.gift[num].children[1].innerHTML
-                            $('.giftBlock:last-child').append(`<p>${name} [${val}]</p>`)
+                            $('.giftBlock:last-child').append(`<p>${name} [${val} шт.]</p>`)
                             var adress = el.link
                             $('.giftBlock:last-child').append(`<a href="${adress}">ССЫЛКА</a>`)
                             finalArr.push(adress)                      
