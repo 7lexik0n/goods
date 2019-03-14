@@ -1,4 +1,4 @@
-//    Enojoy :)
+//    Enjoy :)
     
     var targetWindows = [];
     var commWindow = 0;
