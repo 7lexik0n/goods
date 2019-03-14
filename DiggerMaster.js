@@ -1,3 +1,5 @@
+//    Enojoy :)
+    
     var targetWindows = [];
     var commWindow = 0;
     var giftWindow = 0;
