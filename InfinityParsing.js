@@ -1,7 +1,7 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '0.9.0',
+    scriptVersion = '0.9.1',
     treasureList = {},
 	treasureTd = 5,
     pages = [],
@@ -18,7 +18,7 @@ var iteration = 0,                     // текущая итерация скр
     demoRegime = true;
 
 var treasurePages = 0,                  // количество сокр в списке
-    treasureWindows = [],               // окна сокр
+    treasureWindow = 0,               // окно для сокр
     treasureHrefs = [],                 // ссылки сокр
     treasureWorth = [],                 // ценность сокр
     treasureTime = [],                  // время появления
@@ -66,6 +66,11 @@ generalWindow.moveTo(0,1024);
 generalWindow.resizeTo(0,0);
 generalWindow.document.title = 'PARSING!';
 generalWindow.dtitle = 'PARSING!';
+treasureWindow = window.open('https://rpgtop.su', 'treasureWindow', 'width=64,height=48'); 
+treasureWindow.moveTo(0,1024);
+treasureWindow.resizeTo(0,0);
+treasureWindow.document.title = 'СОКРА';
+treasureWindow.dtitle = 'СОКРА';
 
 				/* Основная функция парсинга */
 
@@ -138,8 +143,7 @@ function findGifts(giftHref) {
                 };
             })(i);
         };
-        if (gifts.length != 0) {
-            giftPages.push(generalWindow.location.href);
+        if (gifts.length != 0) {            
             for (var k = 0; k < gifts.length; k++) {
                 (function(k){
                     // ------------------    Обработка сокр ------------------------- //
@@ -148,39 +152,32 @@ function findGifts(giftHref) {
                         // -------- Первая сокра в списке ------------ //
                         if (treasurePages == 0) {                            
                             console.log('Первая сокра найдена!');
-                            treasureWindows[treasurePages] = window.open(gifts[k].href, 'treasureWind', 'width=64,height=48');                        
-                            treasureWindows[treasurePages].moveTo(0,1024);
-                            treasureWindows[treasurePages].resizeTo(0,0);
+                            treasureWindow.location.href = gifts[k].href;
                             setTimeout(function(){
-                                treasureHrefs[treasurePages] = treasureWindows[treasurePages].location.href;       
-                                treasureNumbers[treasurePages] = treasureWindows[treasurePages].location.href.slice(46,50);                                         
+                                treasureHrefs[treasurePages] = treasureWindow.location.href;       
+                                treasureNumbers[treasurePages] = treasureWindow.location.href.slice(46,50);
                                 console.warn('Открыта сокра №' + treasureNumbers[treasurePages]);
                                 console.log('Адрес сокры: ' + treasureHrefs[treasurePages]);
-                                treasureWorth[treasurePages] = treasureWindows[treasurePages].document.querySelector('.block_5').children[1].children[0].children[1].children[0].innerText;
+                                treasureWorth[treasurePages] = treasureWindow.document.querySelector('.block_5').children[1].children[0].children[1].children[0].innerText;
                                 console.log('Стоимость: ' + treasureWorth[treasurePages] + ' зол.');
-                                isItEmpty(treasureWindows[treasurePages], treasurePages);        
+                                isItEmpty(treasureWindow, treasurePages);        
                                 addTreasureToList(treasurePages, treasureNumbers, treasureHrefs[treasurePages], treasureWorth);
                                 treasurePages++;
                             }, 3000);
-                            setTimeout(function(){
-                                treasureWindows[treasurePages-1].close();
-                            }, 6000);
                         }  
                         // --------- Новые сокры -------- //
                         else { 
                             var matches = 0;
                             treasurePages++;
-                            treasureWindows[treasurePages] = window.open(gifts[k].href, 'treasureWind', 'width=64,height=48');                        
-                            treasureWindows[treasurePages].moveTo(0,1024);
-                            treasureWindows[treasurePages].resizeTo(0,0);
+                            treasureWindow.location.href = gifts[k].href;
                             setTimeout(function(){
                                 // ------------ Проход по сокрам ---------- //
                                 for ( var m = 0; m < treasurePages; m++ ) {
-                                    if (treasureWindows[treasurePages].location.href == treasureHrefs[m]) {
+                                    if (treasureWindow.location.href == treasureHrefs[m]) {
                                         matches++;
-                                        treasureList.devTimes[m] = +treasureWindows[treasurePages].document.querySelector('.block_5').children[1].children[0].children[2].children[0].innerText;
+                                        treasureList.devTimes[m] = +treasureWindow.document.querySelector('.block_5').children[1].children[0].children[2].children[0].innerText;
                                         treasureList.devastation[m].innerText = 'Разграблено: ' + treasureList.devTimes[m] + ' раз(а)';
-                                        if (treasureWindows[treasurePages].document.querySelector('.treasure_main_keys')) {
+                                        if (treasureWindow.document.querySelector('.treasure_main_keys')) {
 											if (treasureList.filling[m] != 'nothingElse') treasureList.filling[m] = true;
 										} else treasureList.filling[m] = false;
                                         if (treasureList.filling[m]) {
@@ -192,21 +189,17 @@ function findGifts(giftHref) {
                                 // ------------ Нет совпадений ---------- //
                                 if (matches == 0) {
                                     console.log('Найдена новая сокра!');
-                                    treasureHrefs[treasurePages] = treasureWindows[treasurePages].location.href;      
-                                    treasureNumbers[treasurePages] = treasureWindows[treasurePages].location.href.slice(46,50);       
+                                    treasureHrefs[treasurePages] = treasureWindow.location.href;      
+                                    treasureNumbers[treasurePages] = treasureWindow.location.href.slice(46,50);       
                                     console.warn('Открыта сокра №' + treasureNumbers[treasurePages]);
                                     console.log('Адрес сокры: ' + treasureHrefs[treasurePages]);
-                                    treasureWorth[treasurePages] = treasureWindows[treasurePages].document.querySelector('.block_5').children[1].children[0].children[1].children[0].innerText;
+                                    treasureWorth[treasurePages] = treasureWindow.document.querySelector('.block_5').children[1].children[0].children[1].children[0].innerText;
                                     console.log('Стоимость: ' + treasureWorth[treasurePages] + ' зол.');
-                                    isItEmpty(treasureWindows[treasurePages], treasurePages);     
+                                    isItEmpty(treasureWindow, treasurePages);     
                                     addTreasureToList(treasurePages, treasureNumbers, treasureHrefs[treasurePages], treasureWorth);
                                     if (treasureList.filling[treasurePages]) console.error('Часть скрипта по сокрам');
                                     else console.log('Хоть тут отдохну ^_^');
-                                    setTimeout(function(){
-                                        treasureWindows[treasurePages].close();
-                                    }, 3000);
                                 } else {
-                                    treasureWindows[treasurePages].close();
                                     treasurePages--;
                                 }                            
                             }, 3000);                            
