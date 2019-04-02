@@ -1,7 +1,7 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '0.9.1',
+    scriptVersion = '0.9.2',
     treasureList = {},
 	treasureTd = 5,
     pages = [],
@@ -674,6 +674,7 @@ function checkForChest(activeTreasurePage, number, treasureList) {
 
 {
     var logo = document.querySelector('#logo'),
+        mainArray = document.querySelector('.main_aray'),
         navigation = document.querySelector('#nav_bar'),
         wrapper = navigation.parentNode,
         top_brand = document.querySelector('#top_brand'),
@@ -697,6 +698,7 @@ function checkForChest(activeTreasurePage, number, treasureList) {
 				/* Добавление DOM объектов на страницу */
 {
     logo.parentNode.removeChild(logo);
+    mainArray.removeChild(document.querySelector('.block_3'));
     wrapper.removeChild(document.querySelector('.reclama468'));
     wrapper.insertBefore(panel, navigation);
     top_brand.style = '';
@@ -832,3 +834,6 @@ function checkForChest(activeTreasurePage, number, treasureList) {
 setInterval(function(){
     console.clear();
 }, 1200000);
+kur_current = hup_current = function(){
+    return true;
+};
