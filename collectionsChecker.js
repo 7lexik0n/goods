@@ -26,7 +26,9 @@ for (let i = 0; i < collections.length; i++) {
 	table.appendChild(tableStroke);
 	var tableCell = document.createElement('td');
 	tableStroke.appendChild(tableCell);
-	tableCell.innerText = collections[i].title.slice(4) + ' (' + collections[i].count + ')';
+    if (+collections[i].title.slice(0,3) < 10) {
+        tableCell.innerText = collections[i].title.slice(3) + ' (' + collections[i].count + ')';
+    } else tableCell.innerText = collections[i].title.slice(4) + ' (' + collections[i].count + ')';	
 	tableStroke.style.fontWeight = 'bold';
 	tableStroke.style.fontSize = '18px';
 	tableCell.style.borderTop = '1px solid #333';
