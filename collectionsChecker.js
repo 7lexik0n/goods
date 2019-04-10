@@ -22,30 +22,39 @@ var mainPage = document.querySelector('.main_aray');
 var firstBlock = document.querySelector('.block_6');
 mainPage.insertBefore(table, firstBlock);
 for (let i = 0; i < collections.length; i++) {
-	var tableStroke = document.createElement('tr');
-	table.appendChild(tableStroke);
-	var tableCell = document.createElement('td');
-	tableStroke.appendChild(tableCell);
+    delete collections[i].count;
+    var collectionTitle = '';
     if (+collections[i].title.slice(0,3) < 10) {
-        tableCell.innerText = collections[i].title.slice(3) + ' (' + collections[i].count + ')';
-    } else tableCell.innerText = collections[i].title.slice(4) + ' (' + collections[i].count + ')';	
-	tableStroke.style.fontWeight = 'bold';
-	tableStroke.style.fontSize = '18px';
-	tableCell.style.borderTop = '1px solid #333';
-	tableCell.style.borderBottom = '1px solid #333';
+        collectionTitle = collections[i].title.slice(3);
+    } else collectionTitle = collections[i].title.slice(4);	
 	delete collections[i].title;
-	delete collections[i].count;
+
 	Object.keys(collections[i]).sort().forEach(function(key) {
 		var tableStroke = document.createElement('tr');
 		table.appendChild(tableStroke);
 		var tableCell = document.createElement('td');
 		tableStroke.appendChild(tableCell);
 		tableCell.innerText = key;
+        tableCell.style.padding = '5px 25px';
+        var tableCell = document.createElement('td');
+		tableStroke.appendChild(tableCell);
+		tableCell.innerText = collectionTitle;
 		var tableCell = document.createElement('td');
 		tableStroke.appendChild(tableCell);
 		tableCell.innerText = collections[i][key];
+        tableCell.style.padding = '5px 25px';
 		if (collections[i][key] == '+') tableStroke.style.fontWeight = 'bold'
 		else tableStroke.style.color = '#7c1b1b';
 	});
+    
+    var tableStroke = document.createElement('tr');
+    table.appendChild(tableStroke);
+    for (let j = 0; j < 3; j++) {
+        var tableCell = document.createElement('td');
+        tableStroke.appendChild(tableCell);
+        tableCell.style.borderTop = '1px solid #333';
+	    tableCell.style.borderBottom = '1px solid #333';
+    }    
 }
 table.style.backgroundColor = '#e8c77b';
+table.style.borderCollapse = 'collapse';
