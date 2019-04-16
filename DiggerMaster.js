@@ -13,7 +13,7 @@
         var n = 0;
         var giftsArray = [];
         var showChecker = 0;
-        var version = '3.0 ALPHA';
+        var version = '3.1';
         var siteTitle = '';
         var instWindow = 0;
         var workTime = 0;
@@ -111,7 +111,7 @@
             }
         };
         function checkSpaun(siteID, winWork) {
-            var spauners = winWork.document.querySelectorAll('.gift span');
+            var spauners = winWork.document.querySelectorAll('.gift span img');
             var siteName = winWork.document.title.slice(16,-10);
             console.log('На сайте ' + siteName + ' установлено спаунеров: ' + spauners.length + ' шт.');
             if (spauners.length < 3) setSpauner(siteID, spauners.length, siteName);
