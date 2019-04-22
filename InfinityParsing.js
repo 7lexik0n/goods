@@ -1,7 +1,7 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '0.9.2',
+    scriptVersion = '0.9.3',
     treasureList = {},
 	treasureTd = 5,
     pages = [],
@@ -35,7 +35,8 @@ var treasurePages = 0,                  // количество сокр в сп
     chests = [],                        // инфа о забранном сундуке
     curNumber = 0,                      // номер текущей сокры
     treasureList = {},                  // инфа по сокрам
-    generalWindow = 0;                  // главное окно поиска
+    generalWindow = 0,                  // главное окно поиска
+    treeWindow = 0;                     // окно дерева подарков
 
     treasureList.filling = [];
     treasureList.devTimes = [];
@@ -71,6 +72,68 @@ treasureWindow.moveTo(0,1024);
 treasureWindow.resizeTo(0,0);
 treasureWindow.document.title = 'СОКРА';
 treasureWindow.dtitle = 'СОКРА';
+treeWindow = window.open('https://rpgtop.su/cgi-bin/g.cgi?a=tree', 'treeWindow', 'width=64,height=48'); 
+treeWindow.moveTo(0,1024);
+treeWindow.resizeTo(0,0);
+treeWindow.document.title = 'ДРЕВО ПОДАРКОВ';
+treeWindow.dtitle = 'ДРЕВО ПОДАРКОВ';
+
+				/* Сбор предметов с древа подарков */   
+
+function collectTree() {
+    treeWindow.location.href = 'https://rpgtop.su/cgi-bin/g.cgi?a=tree';
+    console.warn('Поглядим, чего на деревце созрело...');
+    setTimeout(function(){
+        var tree = treeWindow.document.querySelector('.tree_plods');
+        var plods = tree.querySelectorAll('span a');
+        var plodsFilter = [];
+        for (let i = 0; i < plods.length; i++) {
+            if (plods[i].href.match(/get/)) plodsFilter.push(plods[i]);
+        }
+        plods = [];
+        for (let i = 0; i < plodsFilter.length; i++) {
+            plods[i] = plodsFilter[i].parentElement;
+        }
+        if (plods.length != 0) {
+            if (plods.length > 1) {
+                console.log('На древе созрели предметы:');
+            }
+            else {
+                console.log('На древе созрел предмет:');
+            }
+            for (let i = 0; i < plods.length; i++) {
+                (function(i){
+                    plods[i].children[0].alt;
+                })(i);
+            };
+        };
+        if (plods.length != 0) {
+            for (let k = 0; k < plods.length; k++) {
+                (function(k){
+                    if (k == 0) {
+                        plods[k].children[1].click();
+                        console.warn('Собран 1-й предмет c дерева: ' + plods[k].children[0].alt);
+                    }
+                    else {
+                        if ((treeWindow.document) && (treeWindow.document.body)) {
+                             setTimeout(function(){
+                                 treeWindow.document.body.appendChild(plods[k]);
+                                 console.log('Добавлен ' + (k+1) + ' предмет: ' + plods[k].children[0].alt);                                         
+                             }, 200*k);
+                             setTimeout(function(){
+                                 plods[k].children[1].click();
+                                 console.warn('Собран ' + (k+1) + ' предмет c дерева: ' + plods[k].children[0].alt);
+                             }, 200*k+20);
+                         } else console.log('Загрузка страницы не успела за скриптом!. Предмет будет пропущен во избежание нарушений работы скрипта.');
+                    }
+                })(k);
+            }
+        }
+        else {
+            console.warn('А ничего пока на дереве не созрело! Поиграйте в доминошки!');
+        }
+    }, 3000);    
+}
 
 				/* Основная функция парсинга */
 
@@ -121,6 +184,8 @@ function mainParsing() {
             }, stepEndTime[j]);
         })(j);
     }
+    collectTree();
+    treeID = setInterval(collectTree, 1500000);
 };
 
                 /* Функция поиска и открытия предметов */
@@ -814,6 +879,7 @@ function checkForChest(activeTreasurePage, number, treasureList) {
     });
     stopParse.addEventListener('click', function() {
         clearInterval(mainTimer);
+        clearInterval(treeID);
         for( var t = 0; t < pages.length; t++ ) {
 		  clearTimeout(timersForPages[t]); 
 		  clearInterval(stepTimers[t]);
