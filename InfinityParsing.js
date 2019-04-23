@@ -1,7 +1,7 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '0.9.3',
+    scriptVersion = '0.9.4',
     treasureList = {},
 	treasureTd = 5,
     pages = [],
@@ -763,7 +763,9 @@ function checkForChest(activeTreasurePage, number, treasureList) {
 				/* Добавление DOM объектов на страницу */
 {
     logo.parentNode.removeChild(logo);
-    mainArray.removeChild(document.querySelector('.block_3'));
+    if (document.querySelector('.block_3')) {
+        mainArray.removeChild(document.querySelector('.block_3'));
+    }    
     wrapper.removeChild(document.querySelector('.reclama468'));
     wrapper.insertBefore(panel, navigation);
     top_brand.style = '';
