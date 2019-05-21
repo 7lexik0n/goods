@@ -1,7 +1,8 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '0.9.4',
+    scriptVersion = '0.9.12',
+    minTreasure = 3000,
     treasureList = {},
 	treasureTd = 5,
     pages = [],
@@ -51,32 +52,33 @@ var treasurePages = 0,                  // количество сокр в сп
 }
 
 				/* Первый запуск парсинга без задержки */
-
-function firstStart() {
-    console.clear();
-    console.info('Привет! Запущен скрипт авто-парсинга v.' + scriptVersion + '. Ищу предметы и сокровищницы, а также сообщаю информацию о последних в консоли.');
-    console.log('%cУбедитесь, что всплывающие окна на сайтах https://rpgtop.su и https://top.roleplay.ru не блокируются!', 'font-weight: bold;');
-    mainParsing();
-};
-if (editFirstPage == 0) firstPage = 1;
-for (var i = firstPage; i <= lastPage; i++ ) {
-	pages[i-firstPage] = 'https://rpgtop.su/p' + i + '.html';
+{
+    function firstStart() {
+        console.clear();
+        console.info('Привет! Запущен скрипт авто-парсинга v.' + scriptVersion + '. Ищу предметы и сокровищницы, а также сообщаю информацию о последних в консоли.');
+        console.log('%cУбедитесь, что всплывающие окна на сайтах https://rpgtop.su и https://top.roleplay.ru не блокируются!', 'font-weight: bold;');
+        mainParsing();
+    };
+    if (editFirstPage == 0) firstPage = 1;
+    for (var i = firstPage; i <= lastPage; i++ ) {
+        pages[i-firstPage] = 'https://rpgtop.su/p' + i + '.html';
+    }
+    generalWindow = window.open('https://rpgtop.su', 'generalWindow', 'width=64,height=48'); 
+    generalWindow.moveTo(0,1024);
+    generalWindow.resizeTo(0,0);
+    generalWindow.document.title = 'PARSING!';
+    generalWindow.dtitle = 'PARSING!';
+    treasureWindow = window.open('https://rpgtop.su', 'treasureWindow', 'width=64,height=48'); 
+    treasureWindow.moveTo(0,1024);
+    treasureWindow.resizeTo(0,0);
+    treasureWindow.document.title = 'СОКРА';
+    treasureWindow.dtitle = 'СОКРА';
+    treeWindow = window.open('https://rpgtop.su/cgi-bin/g.cgi?a=tree', 'treeWindow', 'width=64,height=48'); 
+    treeWindow.moveTo(0,1024);
+    treeWindow.resizeTo(0,0);
+    treeWindow.document.title = 'ДРЕВО ПОДАРКОВ';
+    treeWindow.dtitle = 'ДРЕВО ПОДАРКОВ';
 }
-generalWindow = window.open('https://rpgtop.su', 'generalWindow', 'width=64,height=48'); 
-generalWindow.moveTo(0,1024);
-generalWindow.resizeTo(0,0);
-generalWindow.document.title = 'PARSING!';
-generalWindow.dtitle = 'PARSING!';
-treasureWindow = window.open('https://rpgtop.su', 'treasureWindow', 'width=64,height=48'); 
-treasureWindow.moveTo(0,1024);
-treasureWindow.resizeTo(0,0);
-treasureWindow.document.title = 'СОКРА';
-treasureWindow.dtitle = 'СОКРА';
-treeWindow = window.open('https://rpgtop.su/cgi-bin/g.cgi?a=tree', 'treeWindow', 'width=64,height=48'); 
-treeWindow.moveTo(0,1024);
-treeWindow.resizeTo(0,0);
-treeWindow.document.title = 'ДРЕВО ПОДАРКОВ';
-treeWindow.dtitle = 'ДРЕВО ПОДАРКОВ';
 
 				/* Сбор предметов с древа подарков */   
 
@@ -184,8 +186,6 @@ function mainParsing() {
             }, stepEndTime[j]);
         })(j);
     }
-    collectTree();
-    treeID = setInterval(collectTree, 1500000);
 };
 
                 /* Функция поиска и открытия предметов */
@@ -319,6 +319,7 @@ function isItEmpty(currentTreasureWindow, currentNumber) {
         for (var i = 0; i < keys.length; i++) {
             treasureKeys[currentNumber][i] = keys[i].src.slice(24,-4);
             treasureKeysHav[currentNumber][i] = keys[i].parentElement.style.backgroundColor;
+            if ((keys[i].src.slice(24,-4) == 620) || (keys[i].src.slice(24,-4) == 621) || (keys[i].src.slice(24,-4) == 622) || (keys[i].src.slice(24,-4) == 623)) treasureKeysHav[currentNumber][i] = 'red';
         }
 	} else {
 		console.log('К сожалению, ловить тут уже нечего :(');
@@ -390,19 +391,30 @@ function addTreasureToList(i, treasureNumbers, treasureHref, treasureWorth) {
     keysTitle.style.fontSize = '12px';
     keysTitle.innerText = 'Необходимые ключи: ';
     treasureList.keys[i].appendChild(keysTitle);
-    for (var u = 0; u < 4; u++) {
+    
+    if (treasureKeysHav == 0) {
         var keyBlock = document.createElement('span');
-        keyBlock.style.width = '100%';
-        keyBlock.style.textAlign = 'center';
-        keyBlock.style.fontSize = '12px';
-        var havingKey = '';
-        if (treasureKeysHav[i][u] == 'green') havingKey = ' (есть)'
-        else havingKey = ' (нет)';
-        if (u < 3) keyBlock.innerText = treasureKeys[i][u] + havingKey + ', '
-        else keyBlock.innerText = treasureKeys[i][u] + havingKey;
+            keyBlock.style.width = '100%';
+            keyBlock.style.textAlign = 'center';
+            keyBlock.style.fontSize = '12px';
+        keyBlock.innerText = 'cокровищница уже вскрыта!';
         treasureList.keys[i].appendChild(keyBlock);
     }
-    
+    else {
+        for (var u = 0; u < 4; u++) {  
+            var keyBlock = document.createElement('span');
+            keyBlock.style.width = '100%';
+            keyBlock.style.textAlign = 'center';
+            keyBlock.style.fontSize = '12px';
+            var havingKey = '';    
+            if (treasureKeysHav[i][u] == 'green') havingKey = ' (есть)'
+            else havingKey = ' (нет)';
+            if (u < 3) keyBlock.innerText = treasureKeys[i][u] + havingKey + ', '
+            else keyBlock.innerText = treasureKeys[i][u] + havingKey;
+            treasureList.keys[i].appendChild(keyBlock);
+        }                        
+    }
+        
     treasureList.diggBtn[i] = document.createElement('button');
     treasureList.diggBtn[i].style.display = 'block';
     treasureList.diggBtn[i].style.width = '180px';
@@ -436,6 +448,11 @@ function addTreasureToList(i, treasureNumbers, treasureHref, treasureWorth) {
             });
         })(i);    
     }
+    if (demoRegime == false) {
+        (function(i){
+            treasureList.diggBtn[i].click();
+        })(i);
+    }
 };
 
                 /* Рандомайзер от 1.0 до 1.5 */
@@ -451,7 +468,7 @@ function firstUseOfTreasure(number) {
     activeTreasurePage[number].moveTo(0,1024);
     activeTreasurePage[number].resizeTo(0,0);
     console.warn('Начата работа скрипта по получению ключей в сокровищнице №' + treasureNumbers[number]);
-    
+    checkForChest(activeTreasurePage, number, treasureList);
     var beginWaitingTime = new Date();
 	var beginWaitingHours = beginWaitingTime.getHours(),
    	    beginWaitingMinutes = beginWaitingTime.getMinutes(),
@@ -471,7 +488,7 @@ function firstUseOfTreasure(number) {
 
 function getOptimalTime(activeTreasurePage, number, treasureList) {
     console.warn('Запущена функция получения оптимального времени для сокровищницы №' + treasureNumbers[number]);
-    
+    checkForChest(activeTreasurePage, number, treasureList);
     var beginWaitingTime = new Date();
 	var beginWaitingHours = beginWaitingTime.getHours(),
 	    beginWaitingMinutes = beginWaitingTime.getMinutes(),
@@ -483,20 +500,26 @@ function getOptimalTime(activeTreasurePage, number, treasureList) {
     
     if (!activeTreasurePage[number]) {
 		console.error('Cокровищница №' + treasureNumbers[number] + '. Такой страницы вообще нет! Критическая ошибка. Функция обрывается. ');
-        console.warn('Доработать механизм перезапуска поиска!');
+        console.warn('Доработать механизм перезапуска поиска!');        
+        activeTreasurePage[number].close();
 		return false;
 	}    
     if ((treasureList.filling[number] == 'nothingElse') || (!treasureList.filling[number])) {
 		console.error('Cокровищница №' + treasureNumbers[number] + ' опустошена либо недоступна. Функция обрывается');
+        treasureList.diggBtn[number].innerText = 'Вскрыта!';
+        treasureList.diggBtn[number].disabled = 'true';
+        activeTreasurePage[number].close();
 		return false;
 	}    
     if (!activeTreasurePage[number].document.querySelector('.treasure_main_text')) {
 		console.error('Cокровищница №' + treasureNumbers[number] + '. На искомой странице отсутствует сокровищница. Функция обрывается. ');
-        console.warn('Доработать механизм перезапуска поиска!');
+        console.warn('Доработать механизм перезапуска поиска!');        
+        activeTreasurePage[number].close();
 		return false;
 	}        
     if (activeTreasurePage[number].document.querySelector('.treasure_main_text').childElementCount == 1) {
-		console.error('Сокровищница опустошена!');
+		console.error('Сокровищница опустошена!');        
+        activeTreasurePage[number].close();
 		return false;
 	}
     
@@ -656,7 +679,7 @@ function findOptimalTime(treasurePageClones, activeTreasurePage, number, rpgTopV
             
             console.log('Сокровищница №' + treasureNumbers[number] + '. На следующей итерации поиска останется посетить сайтов: ' + (4 - activeTreasuresStep[number]));
             
-            if (activeTreasuresStep[number] == 4) {
+            if (activeTreasuresStep[number] >= 3) {
                 console.log('На следующем проходе работа с сокровищницей будет завершена!');
                 setTimeout(checkForChest(activeTreasurePage, number, treasureList), timeOfKeyFinding[number]*1000);                                   // проверка сундука
                 console.log('Сокровищница №' + treasureNumbers[number] + '. setTimeout установлен! Время ожидания: ' + timeOfKeyFinding[number] + ' сек.');
@@ -707,6 +730,7 @@ function checkForChest(activeTreasurePage, number, treasureList) {
     if ((chests[number]) || (!treasureList.filling)) {
 		console.warn('Сокровищница №' + treasureNumbers[number] + '. Так здесь сундук уже забран! Это ли не прекрасно!');
 		console.log('Работа по сокровищнице №' + treasureNumbers[number] + ' завершена!');
+        activeTreasurePage[number].close();
 		return true;
 	}
     
@@ -720,17 +744,42 @@ function checkForChest(activeTreasurePage, number, treasureList) {
         if ((keyImgs[i].src.slice(24,-4) == 621) || (keyImgs[i].src.slice(24,-4) == 620) || (keyImgs[i].src.slice(24,-4) == 623) || (keyImgs[i].src.slice(24,-4) == 622)) splinters++;
     }
     
-    if ((redKeys == 0) && (splinters == 0) && (activeTreasuresStep[number] == 4) && (activeTreasurePage[number].document.querySelector('.treasure_main_text').children[2].children[3])) {
-        activeTreasurePage[number].document.querySelector('.treasure_main_text form').children[3].click();
-        console.warn('Сокровищница №' + treasureNumbers[number] + '. Сундук удачно забран :)'); 
-        treasureList.filling[number] = false;
-        treasureList.treasuresLeft[number].innerText = 'Опустошена';
-        chests[number] = true;
-        return true;
+    if ((redKeys == 0) && (splinters == 0) && (activeTreasuresStep[number] == 4) && (activeTreasurePage[number].document.querySelector('.treasure_main_text').children[2].children[3])) {       if ((treasureWorth[number]) > minTreasure) {
+            var devided = Math.round((treasureWorth[number]/1000));
+            if (devided >= treasureList.devTimes[number]) {
+                console.warn('Сокровищница №' + treasureNumbers[number] + '. Буду грабить!');
+                activeTreasurePage[number].document.querySelector('.treasure_main_text form').children[3].click();
+                console.warn('Сокровищница №' + treasureNumbers[number] + '. Сундук удачно забран :)'); 
+                treasureList.filling[number] = false;
+                treasureList.treasuresLeft[number].innerText = 'Опустошена';
+                chests[number] = true;
+                (function(number){
+                    setTimeout(function(){
+                        activeTreasurePage[number].close();
+                    }, 2000); 
+                })(number);               
+                return true;
+            }
+            else {
+                console.warn('Сокровищница №' + treasureNumbers[number] + '. Ограбили уже ' + treasureWorth[number] + ' раз(а)! Брезгую!');
+                treasureList.diggBtn[number].innerText = 'Ну такое...';
+                activeTreasurePage[number].close();
+            }
+        }
+        else {
+            console.warn('Сокровищница №' + treasureNumbers[number] + '. Ограбили уже ' + treasureList.devTimes[number] + ' зол.! Дешман!');
+            treasureList.diggBtn[number].innerText = 'Дешман!';
+            activeTreasurePage[number].close();
+        }
     } else {
         console.warn('Сокровищница №' + treasureNumbers[number] + '. Не могу взять сундук!');
         console.log('Сокровищница №' + treasureNumbers[number] + '. Недоступных ключей/осколков: ' + redKeys);
         console.log('Сокровищница №' + treasureNumbers[number] + '. Из них осколков: ' + splinters);
+        if (activeTreasuresStep[number] >= 4) {
+            console.warn('Сокровищница №' + treasureNumbers[number] + '. Использовано попыток: ' + activeTreasuresStep[number] + '. Сундук не взять! Уходим гордо!');
+            treasureList.diggBtn[number].innerText = 'Ну и не надо!';
+            activeTreasurePage[number].close();
+        }
 		return false;
     }
 };
@@ -877,7 +926,9 @@ function checkForChest(activeTreasurePage, number, treasureList) {
         runParse.style.marginLeft = '17%';
         emptyTreasures.innerText = 'Пока пусто! Ждём...';
         firstStart();
-        mainTimer = setInterval(mainParsing, 3780000);
+        mainTimer = setInterval(mainParsing, 3780000);        
+        collectTree();
+        treeID = setInterval(collectTree, 1500000);
     });
     stopParse.addEventListener('click', function() {
         clearInterval(mainTimer);
@@ -898,10 +949,13 @@ function checkForChest(activeTreasurePage, number, treasureList) {
 }
 
                 /* Чистим консоль */
+//
+//setInterval(function(){
+//    console.clear();
+//}, 1200000);
 
-setInterval(function(){
-    console.clear();
-}, 1200000);
+                /* Убираем мусор топа */
+
 kur_current = hup_current = function(){
     return true;
 };
