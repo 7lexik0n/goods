@@ -637,6 +637,7 @@
             str = area.value;
             hrefArray = str.match(/https:\/\/\S+/g);
             for (var i = 0; i < hrefArray.length; i++) {
+                hrefArray[i] = hrefArray[i].replace(/['"]+/g, '');
                 addSite(hrefArray[i]);
             }
             area.value = '';
