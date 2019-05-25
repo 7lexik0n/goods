@@ -864,7 +864,7 @@ function whatDigg() {
         console.warn('Список актуальных спаунеров:');
         for (var key in spaunersItemList) {
             console.warn(key);
-            console.log('Количество: 'spaunersItemList[key]['Количество']);
+            console.log('Количество: ' + spaunersItemList[key]['Количество']);
             spaunersItemList[key]['Ссылки'] = unique(spaunersItemList[key]['Ссылки']);
             console.log(spaunersItemList[key]['Ссылки']);
         }        
