@@ -1,7 +1,7 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '1.0',
+    scriptVersion = '1.1',
     minTreasure = 1500,
     treasureList = {},
 	treasureTd = 5,
@@ -17,7 +17,10 @@ var iteration = 0,                     // текущая итерация скр
     firstPage = 1,                     // первая страница по дефолту
     lastPage = 20,                     // последняя страница по дефолту
     demoRegime = false,
-    autoStole = false;
+    autoStole = false,
+    spaunersList = ["Уголок библиотеки", "Хвойный лес", "Дубовая роща", "Звездное небо", "Гнездо", "Глиняный карьер", "Средняя угольная шахта", "Пшеничное поле", "Гора Фиджи", "Осиновый лес", "Место раскопок", "Поле битвы", "Песочный карьер", "Дом призраков", "Лещина обыкновенная", "Имбирное поле", "Березовая роща", "Малая железная шахта", "Средняя железная шахта", "Тополиная аллея", "Бамбуковая роща", "Поле сахарной свеклы", "Курица Пышка", "Сочный луг", "Галактика", "Малая угольная шахта", "Льняное поле", "Рисовое поле", "Галактика «Звездных войн»", "Искусственный пруд"],
+    spaunersPrev = {},
+    spaunersCurrent = {};
 
 var treasurePages = 0,                  // количество сокр в списке
     treasureWindow = 0,               // окно для сокр
@@ -142,6 +145,8 @@ function collectTree() {
 
 function mainParsing() {
     iteration++;
+    spaunersPrev = spaunersCurrent;
+    spaunersCurrent = {};
     console.log('Инициирован проход скрипта №' + iteration + '\nСкрипт работает, вы отдыхаете! Хорошего дня :)');
     var beginWaitingTime = new Date();
 	var beginWaitingHours = beginWaitingTime.getHours(),
@@ -222,6 +227,17 @@ function findGifts(giftHref) {
             (function(i){
                 if (giftImgs[i].alt != '') {
                     console.log(giftImgs[i].alt);
+                    spaunersList.forEach(function(cur){
+                        if (giftImgs[i].alt == cur) {
+                            if (!spaunersCurrent[cur]) {
+                                spaunersCurrent[cur] = {};
+                                spaunersCurrent[cur]['Количество'] = 0;
+                                spaunersCurrent[cur]['Ссылки'] = [];
+                            }
+                            spaunersCurrent[cur]['Количество']++;
+                            spaunersCurrent[cur]['Ссылки'].push(giftHref.href);
+                        }
+                    });
                 };
             })(i);
         };
@@ -482,7 +498,7 @@ function addTreasureToList(i, treasureNumbers, treasureHref, treasureWorth) {
             if (stoleCheck.checked) {
                 treasureList.diggBtn[i].click();
             }
-            else console.warn('Сокровищница №' + treasureNumbers[i] + ' добавлена в список. Автоматическа обработка отключена. Кайеф! Копайте сами!');
+            else console.warn('Сокровищница №' + treasureNumbers[i] + ' добавлена в список. Автоматическая обработка отключена. Кайеф! Копайте сами!');
         })(i);
     }
 };
@@ -826,6 +842,46 @@ function howMuch(number) {
     return curWorth;
 }
 
+                /* Функция отображения актуальных спаунеров */
+
+function whatDigg() {
+    var spaunersItemList;
+    if (iteration == 1) {
+        spaunersItemList = spaunersCurrent;
+    }
+    else {
+        spaunersItemList = spaunersPrev;
+    }
+    var counter = 0;
+    for (var key in spaunersItemList) {
+        counter++;
+    }
+    if  (counter == 0) {
+        console.warn('Пока спаунеров не найдено! Пдажжи!');
+        return false;
+    }
+    else {
+        console.warn('Список актуальных спаунеров:');
+        for (var key in spaunersItemList) {
+            console.warn(key);
+            console.log('Количество: 'spaunersItemList[key]['Количество']);
+            spaunersItemList[key]['Ссылки'] = unique(spaunersItemList[key]['Ссылки']);
+            console.log(spaunersItemList[key]['Ссылки']);
+        }        
+    }
+}
+
+                /* Функция уникализации элементов массива */
+
+function unique(arr) {
+    var obj = {};
+    for (let i = 0; i < arr.length; i++) {
+        var str = arr[i];
+        obj[str] = true;
+    }
+    return Object.keys(obj);
+}
+
                 /* Создаем DOM объекты */
 
 {
@@ -940,12 +996,12 @@ function howMuch(number) {
     panelTreasures.innerText = 'Список сокровищниц';
     runParse.style.display = 'inline-block';
     runParse.style.margin = '5px auto 10px';
-    runParse.style.marginLeft = '16.5%';
+    runParse.style.marginLeft = '23.5%';
     runParse.innerText = 'Запустить скрипт';
     refreshBtn.style.display = 'inline-block';
     refreshBtn.style.margin = '5px auto 10px';
     refreshBtn.style.marginLeft = '2%';
-    refreshBtn.innerText = 'Обновить информацию';
+    refreshBtn.innerText = 'Что копать?';
     stopParse.style.display = 'inline-block';
     stopParse.style.margin = '5px auto 10px';
     stopParse.style.marginLeft = '2%';
@@ -1007,9 +1063,12 @@ function howMuch(number) {
 				/* Добавление обработчиков */
 
 {
+    top_brand.parentElement.addEventListener('click', function(evt){
+        evt.preventDefault();
+    });
     runParse.addEventListener('click', function(){
         runParse.innerText = 'Начать перезапуск!';
-        runParse.style.marginLeft = '17%';
+        runParse.style.marginLeft = '22.5%';
         emptyTreasures.innerText = 'Пока пусто! Ждём...';
         firstStart();
         mainTimer = setInterval(mainParsing, 3780000);        
@@ -1032,6 +1091,7 @@ function howMuch(number) {
         panelNextStepTime.innerText = '';
         panelTimer.innerText = 'Скрипт остановлен';
     });
+    refreshBtn.addEventListener('click', whatDigg);
 }
 
                 /* Чистим консоль */
