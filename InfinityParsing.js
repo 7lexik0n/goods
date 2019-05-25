@@ -1,7 +1,7 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '1.1',
+    scriptVersion = '1.2',
     minTreasure = 1500,
     treasureList = {},
 	treasureTd = 5,
@@ -20,7 +20,9 @@ var iteration = 0,                     // текущая итерация скр
     autoStole = false,
     spaunersList = ["Уголок библиотеки", "Хвойный лес", "Дубовая роща", "Звездное небо", "Гнездо", "Глиняный карьер", "Средняя угольная шахта", "Пшеничное поле", "Гора Фиджи", "Осиновый лес", "Место раскопок", "Поле битвы", "Песочный карьер", "Дом призраков", "Лещина обыкновенная", "Имбирное поле", "Березовая роща", "Малая железная шахта", "Средняя железная шахта", "Тополиная аллея", "Бамбуковая роща", "Поле сахарной свеклы", "Курица Пышка", "Сочный луг", "Галактика", "Малая угольная шахта", "Льняное поле", "Рисовое поле", "Галактика «Звездных войн»", "Искусственный пруд"],
     spaunersPrev = {},
-    spaunersCurrent = {};
+    spaunersCurrent = {},
+    persSpaunersPrev = {},
+    persSpaunersCurrent = {};
 
 var treasurePages = 0,                  // количество сокр в списке
     treasureWindow = 0,               // окно для сокр
@@ -147,6 +149,8 @@ function mainParsing() {
     iteration++;
     spaunersPrev = spaunersCurrent;
     spaunersCurrent = {};
+    persSpaunersPrev = persSpaunersCurrent;
+    persSpaunersCurrent = {};
     console.log('Инициирован проход скрипта №' + iteration + '\nСкрипт работает, вы отдыхаете! Хорошего дня :)');
     var beginWaitingTime = new Date();
 	var beginWaitingHours = beginWaitingTime.getHours(),
@@ -229,13 +233,24 @@ function findGifts(giftHref) {
                     console.log(giftImgs[i].alt);
                     spaunersList.forEach(function(cur){
                         if (giftImgs[i].alt == cur) {
-                            if (!spaunersCurrent[cur]) {
+                            if (giftImgs[i].style.outline != 'rgba(35, 94, 213, 0.5) solid 5px') {
+                                if (!spaunersCurrent[cur]) {
                                 spaunersCurrent[cur] = {};
                                 spaunersCurrent[cur]['Количество'] = 0;
                                 spaunersCurrent[cur]['Ссылки'] = [];
+                                }
+                                spaunersCurrent[cur]['Количество']++;
+                                spaunersCurrent[cur]['Ссылки'].push(giftHref.href);
                             }
-                            spaunersCurrent[cur]['Количество']++;
-                            spaunersCurrent[cur]['Ссылки'].push(giftHref.href);
+                            else {
+                                if (!persSpaunersCurrent[cur]) {
+                                persSpaunersCurrent[cur] = {};
+                                persSpaunersCurrent[cur]['Количество'] = 0;
+                                persSpaunersCurrent[cur]['Ссылки'] = [];
+                                }
+                                persSpaunersCurrent[cur]['Количество']++;
+                                persSpaunersCurrent[cur]['Ссылки'].push(giftHref.href);
+                            }
                         }
                     });
                 };
@@ -846,11 +861,14 @@ function howMuch(number) {
 
 function whatDigg() {
     var spaunersItemList;
+    var persSpaunersList;
     if (iteration == 1) {
         spaunersItemList = spaunersCurrent;
+        persSpaunersList = persSpaunersCurrent;
     }
     else {
         spaunersItemList = spaunersPrev;
+        persSpaunersList = persSpaunersPrev;
     }
     var counter = 0;
     for (var key in spaunersItemList) {
@@ -858,7 +876,6 @@ function whatDigg() {
     }
     if  (counter == 0) {
         console.warn('Пока спаунеров не найдено! Пдажжи!');
-        return false;
     }
     else {
         console.warn('Список актуальных спаунеров:');
@@ -867,6 +884,22 @@ function whatDigg() {
             console.log('Количество: ' + spaunersItemList[key]['Количество']);
             spaunersItemList[key]['Ссылки'] = unique(spaunersItemList[key]['Ссылки']);
             console.log(spaunersItemList[key]['Ссылки']);
+        }        
+    }
+    counter = 0;
+    for (var key in persSpaunersList) {
+        counter++;
+    }
+    if  (counter == 0) {
+        console.warn('Персональных спаунеров не ма!');
+    }
+    else {
+        console.warn('Список актуальных персональных спаунеров:');
+        for (var key in persSpaunersList) {
+            console.warn(key);
+            console.log('Количество: ' + persSpaunersList[key]['Количество']);
+            persSpaunersList[key]['Ссылки'] = unique(persSpaunersList[key]['Ссылки']);
+            console.log(persSpaunersList[key]['Ссылки']);
         }        
     }
 }
