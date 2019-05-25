@@ -1,8 +1,8 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '0.9.12',
-    minTreasure = 3000,
+    scriptVersion = '1.0',
+    minTreasure = 1500,
     treasureList = {},
 	treasureTd = 5,
     pages = [],
@@ -16,7 +16,8 @@ var iteration = 0,                     // текущая итерация скр
     editFirstPage = 0,                 // 1 - недефолтный список страниц, 0 - дефолтный
     firstPage = 1,                     // первая страница по дефолту
     lastPage = 20,                     // последняя страница по дефолту
-    demoRegime = true;
+    demoRegime = false,
+    autoStole = false;
 
 var treasurePages = 0,                  // количество сокр в списке
     treasureWindow = 0,               // окно для сокр
@@ -60,7 +61,7 @@ var treasurePages = 0,                  // количество сокр в сп
         mainParsing();
     };
     if (editFirstPage == 0) firstPage = 1;
-    for (var i = firstPage; i <= lastPage; i++ ) {
+    for(let i = firstPage; i <= lastPage; i++ ) {
         pages[i-firstPage] = 'https://rpgtop.su/p' + i + '.html';
     }
     generalWindow = window.open('https://rpgtop.su', 'generalWindow', 'width=64,height=48'); 
@@ -142,10 +143,26 @@ function collectTree() {
 function mainParsing() {
     iteration++;
     console.log('Инициирован проход скрипта №' + iteration + '\nСкрипт работает, вы отдыхаете! Хорошего дня :)');
+    var beginWaitingTime = new Date();
+	var beginWaitingHours = beginWaitingTime.getHours(),
+	    beginWaitingMinutes = beginWaitingTime.getMinutes(),
+	    beginWaitingSeconds = beginWaitingTime.getSeconds();
+	if (beginWaitingHours < 10) beginWaitingHours = '0' + beginWaitingHours;
+	if (beginWaitingMinutes < 10) beginWaitingMinutes = '0' + beginWaitingMinutes;
+	if (beginWaitingSeconds < 10) beginWaitingSeconds = '0' + beginWaitingSeconds;
+	panelStartTime.innerText = 'Начало текущей итерации: ' + beginWaitingHours + ':' + beginWaitingMinutes + ':' + beginWaitingSeconds;
+    var nextStartTime = new Date(+beginWaitingTime + 3780000);
+    var nextStartHours = nextStartTime.getHours(),
+	    nextStartMinutes = nextStartTime.getMinutes(),
+	    nextStartSeconds = nextStartTime.getSeconds();
+	if (nextStartHours < 10) nextStartHours = '0' + nextStartHours;
+	if (nextStartMinutes < 10) nextStartMinutes = '0' + nextStartMinutes;
+	if (nextStartSeconds < 10) nextStartSeconds = '0' + nextStartSeconds;
+    panelNextStepTime.innerText = 'Начало новой итерации: ' + nextStartHours + ':' + nextStartMinutes + ':' + nextStartSeconds;
     generalWindow.document.title = 'PARSING!';
     scriptIteration.innerText = 'Текущая итерация скрипта: ' + iteration;
     var timeBuffer = 0;
-    for (var j = 0; j < pages.length; j++) {
+    for(let j = 0; j < pages.length; j++) {
         (function(j){
             stepInitialTime[j] = timeBuffer;
             var timeBufferStep = 100000*randomize();
@@ -174,7 +191,7 @@ function mainParsing() {
                 console.log('Ожидание загрузки страницы: 3 сек.');
                 setTimeout(function(){                    
                     var comments = generalWindow.document.body.querySelectorAll('.comments a');
-                    for ( var i = 0; i < comments.length; i++ ) {
+                    for( let i = 0; i < comments.length; i++ ) {
                         (function(i){
                             timersForGifts[i] = setTimeout(findGifts, 5000*i, comments[i]);
                         })(i);
@@ -201,7 +218,7 @@ function findGifts(giftHref) {
         if (giftImgs.length != 0) {
 			console.log('На сайте ' + generalWindow.document.querySelector('h1.without_ico').innerText.slice(16) + ' (' + giftHref +') обнаружено:');
 		};
-        for (var i = 0; i < giftImgs.length; i++) {
+        for(let i = 0; i < giftImgs.length; i++) {
             (function(i){
                 if (giftImgs[i].alt != '') {
                     console.log(giftImgs[i].alt);
@@ -209,11 +226,11 @@ function findGifts(giftHref) {
             })(i);
         };
         if (gifts.length != 0) {            
-            for (var k = 0; k < gifts.length; k++) {
+            for(let k = 0; k < gifts.length; k++) {
                 (function(k){
                     // ------------------    Обработка сокр ------------------------- //
                     if (gifts[k].href.indexOf('treasure') != -1) {
-                        console.error('Часть скрипта по сокрам');  
+//                        console.error('Часть скрипта по сокрам');  
                         // -------- Первая сокра в списке ------------ //
                         if (treasurePages == 0) {                            
                             console.log('Первая сокра найдена!');
@@ -227,17 +244,16 @@ function findGifts(giftHref) {
                                 console.log('Стоимость: ' + treasureWorth[treasurePages] + ' зол.');
                                 isItEmpty(treasureWindow, treasurePages);        
                                 addTreasureToList(treasurePages, treasureNumbers, treasureHrefs[treasurePages], treasureWorth);
-                                treasurePages++;
+                                treasurePages = 1;
                             }, 3000);
                         }  
                         // --------- Новые сокры -------- //
                         else { 
                             var matches = 0;
-                            treasurePages++;
                             treasureWindow.location.href = gifts[k].href;
                             setTimeout(function(){
                                 // ------------ Проход по сокрам ---------- //
-                                for ( var m = 0; m < treasurePages; m++ ) {
+                                for( let m = 0; m < treasurePages; m++ ) {
                                     if (treasureWindow.location.href == treasureHrefs[m]) {
                                         matches++;
                                         treasureList.devTimes[m] = +treasureWindow.document.querySelector('.block_5').children[1].children[0].children[2].children[0].innerText;
@@ -252,7 +268,7 @@ function findGifts(giftHref) {
                                     }
                                 }
                                 // ------------ Нет совпадений ---------- //
-                                if (matches == 0) {
+                                if (matches == 0) {                                    
                                     console.log('Найдена новая сокра!');
                                     treasureHrefs[treasurePages] = treasureWindow.location.href;      
                                     treasureNumbers[treasurePages] = treasureWindow.location.href.slice(46,50);       
@@ -264,9 +280,8 @@ function findGifts(giftHref) {
                                     addTreasureToList(treasurePages, treasureNumbers, treasureHrefs[treasurePages], treasureWorth);
                                     if (treasureList.filling[treasurePages]) console.error('Часть скрипта по сокрам');
                                     else console.log('Хоть тут отдохну ^_^');
-                                } else {
-                                    treasurePages--;
-                                }                            
+                                    treasurePages = treasurePages + 1;
+                                }                         
                             }, 3000);                            
                         };
                     }
@@ -308,20 +323,21 @@ function isItEmpty(currentTreasureWindow, currentNumber) {
     var devastation = +currentTreasureWindow.document.querySelector('.block_5').children[1].children[0].children[2].children[0].innerText,
         time = currentTreasureWindow.document.querySelector('.block_5').children[1].children[0].children[0].children[0].innerText;
         treasureTime[currentNumber] = time;
+    treasureKeys[currentNumber] = [];
+    treasureKeysHav[currentNumber] = [];
     if (currentTreasureWindow.document.querySelector('.treasure_main_keys')) {
 		if ( devastation > 2) console.log('Тут, кстати, еще даже что-то есть :) \nПравда, опустошили уже ' + devastation + ' раз(а). На многое рассчитывать не стоит. Зато около 0.2 баллов опыта, что тоже неплохо!');
 		else console.log('Тут, кстати, еще даже что-то есть :) \nА мы в числе первых!');
 		if (treasureList.filling[currentNumber] != 'nothingElse') treasureList.filling[currentNumber] = true;
-		treasureList.devTimes[currentNumber] = devastation;
-        treasureKeys[currentNumber] = [];
-        treasureKeysHav[currentNumber] = [];
+		treasureList.devTimes[currentNumber] = devastation;        
         var keys = currentTreasureWindow.document.querySelector('.treasure_main_keys').querySelectorAll('img');
-        for (var i = 0; i < keys.length; i++) {
+        for(let i = 0; i < keys.length; i++) {
             treasureKeys[currentNumber][i] = keys[i].src.slice(24,-4);
             treasureKeysHav[currentNumber][i] = keys[i].parentElement.style.backgroundColor;
             if ((keys[i].src.slice(24,-4) == 620) || (keys[i].src.slice(24,-4) == 621) || (keys[i].src.slice(24,-4) == 622) || (keys[i].src.slice(24,-4) == 623)) treasureKeysHav[currentNumber][i] = 'red';
         }
 	} else {
+//        console.warn('Часть скрипта присваивания ключей');
 		console.log('К сожалению, ловить тут уже нечего :(');
 		treasureList.filling[currentNumber] = false;
 		treasureList.devTimes[currentNumber] = devastation;
@@ -391,8 +407,7 @@ function addTreasureToList(i, treasureNumbers, treasureHref, treasureWorth) {
     keysTitle.style.fontSize = '12px';
     keysTitle.innerText = 'Необходимые ключи: ';
     treasureList.keys[i].appendChild(keysTitle);
-    
-    if (treasureKeysHav == 0) {
+    if (treasureKeysHav[i] == 0) {
         var keyBlock = document.createElement('span');
             keyBlock.style.width = '100%';
             keyBlock.style.textAlign = 'center';
@@ -401,7 +416,7 @@ function addTreasureToList(i, treasureNumbers, treasureHref, treasureWorth) {
         treasureList.keys[i].appendChild(keyBlock);
     }
     else {
-        for (var u = 0; u < 4; u++) {  
+        for(let u = 0; u < 4; u++) {  
             var keyBlock = document.createElement('span');
             keyBlock.style.width = '100%';
             keyBlock.style.textAlign = 'center';
@@ -418,23 +433,37 @@ function addTreasureToList(i, treasureNumbers, treasureHref, treasureWorth) {
     treasureList.diggBtn[i] = document.createElement('button');
     treasureList.diggBtn[i].style.display = 'block';
     treasureList.diggBtn[i].style.width = '180px';
-    treasureList.diggBtn[i].style.padding = '5px 15px';
     treasureList.diggBtn[i].style.boxSizing = 'border-box';
     treasureList.diggBtn[i].style.textAlign = 'center';
-    treasureList.diggBtn[i].style.margin = '5px auto';
+    treasureList.diggBtn[i].style.margin = '10px auto';
     treasureList.diggBtn[i].style.marginBottom = '10px';
-    treasureList.diggBtn[i].style.fontSize = '14px';
-    treasureList.diggBtn[i].innerText = 'Искать ключи';
+    treasureList.diggBtn[i].innerText = 'Искать ключи';    
     
-    panel.insertBefore(treasureList.treasuresNames[i], runParse);
+    panel.insertBefore(treasureList.treasuresNames[i], runParse);    
+    treasureList.treasuresNames[i].classList.add('parserText');
+    treasureList.treasuresNames[i].classList.add('parserTreasureInfo');
 	panel.insertBefore(treasureList.treasuresLeft[i], runParse);
+    treasureList.treasuresLeft[i].classList.add('parserText');
+    treasureList.treasuresLeft[i].classList.add('parserTreasureInfo');
 	panel.insertBefore(treasureList.devastation[i], runParse);
+    treasureList.devastation[i].classList.add('parserText');
+    treasureList.devastation[i].classList.add('parserTreasureInfo');
 	panel.insertBefore(treasureList.worth[i], runParse);
+    treasureList.worth[i].classList.add('parserText');
+    treasureList.worth[i].classList.add('parserTreasureInfo');
 	panel.insertBefore(treasureList.hrefs[i], runParse);
+    treasureList.hrefs[i].classList.add('parserText');
+    treasureList.hrefs[i].classList.add('parserTreasureInfo');
     panel.insertBefore(treasureList.time[i], runParse);
+    treasureList.time[i].classList.add('parserText');
+    treasureList.time[i].classList.add('parserTreasureTime');
     panel.insertBefore(treasureList.keys[i], runParse);
+    treasureList.keys[i].classList.add('parserText');
+    treasureList.keys[i].classList.add('parserKeys');
     if (demoRegime == false) {
         panel.insertBefore(treasureList.diggBtn[i], runParse);
+        treasureList.diggBtn[i].classList.add('parserButton');
+        treasureList.diggBtn[i].classList.add('diggButton');
     }    
     
     if (demoRegime == false) {
@@ -450,7 +479,10 @@ function addTreasureToList(i, treasureNumbers, treasureHref, treasureWorth) {
     }
     if (demoRegime == false) {
         (function(i){
-            treasureList.diggBtn[i].click();
+            if (stoleCheck.checked) {
+                treasureList.diggBtn[i].click();
+            }
+            else console.warn('Сокровищница №' + treasureNumbers[i] + ' добавлена в список. Автоматическа обработка отключена. Кайеф! Копайте сами!');
         })(i);
     }
 };
@@ -488,7 +520,6 @@ function firstUseOfTreasure(number) {
 
 function getOptimalTime(activeTreasurePage, number, treasureList) {
     console.warn('Запущена функция получения оптимального времени для сокровищницы №' + treasureNumbers[number]);
-    checkForChest(activeTreasurePage, number, treasureList);
     var beginWaitingTime = new Date();
 	var beginWaitingHours = beginWaitingTime.getHours(),
 	    beginWaitingMinutes = beginWaitingTime.getMinutes(),
@@ -512,9 +543,12 @@ function getOptimalTime(activeTreasurePage, number, treasureList) {
 		return false;
 	}    
     if (!activeTreasurePage[number].document.querySelector('.treasure_main_text')) {
-		console.error('Cокровищница №' + treasureNumbers[number] + '. На искомой странице отсутствует сокровищница. Функция обрывается. ');
-        console.warn('Доработать механизм перезапуска поиска!');        
+		console.error('Cокровищница №' + treasureNumbers[number] + '. На искомой странице отсутствует сокровищница. Функция обрывается. ');  
+        console.error('Cокровищница №' + treasureNumbers[number] + '. Запускается механизм перезапуска поиска ключей!');  
         activeTreasurePage[number].close();
+        setTimeout(function(){
+            firstUseOfTreasure(number);
+        }, 5000);        
 		return false;
 	}        
     if (activeTreasurePage[number].document.querySelector('.treasure_main_text').childElementCount == 1) {
@@ -679,9 +713,8 @@ function findOptimalTime(treasurePageClones, activeTreasurePage, number, rpgTopV
             
             console.log('Сокровищница №' + treasureNumbers[number] + '. На следующей итерации поиска останется посетить сайтов: ' + (4 - activeTreasuresStep[number]));
             
-            if (activeTreasuresStep[number] >= 3) {
+            if (activeTreasuresStep[number] >= 4) {
                 console.log('На следующем проходе работа с сокровищницей будет завершена!');
-                setTimeout(checkForChest(activeTreasurePage, number, treasureList), timeOfKeyFinding[number]*1000);                                   // проверка сундука
                 console.log('Сокровищница №' + treasureNumbers[number] + '. setTimeout установлен! Время ожидания: ' + timeOfKeyFinding[number] + ' сек.');
                 var beginWaitingTime = new Date();
 				var beginWaitingHours = beginWaitingTime.getHours(),
@@ -691,6 +724,9 @@ function findOptimalTime(treasurePageClones, activeTreasurePage, number, rpgTopV
 				if (beginWaitingMinutes < 10) beginWaitingMinutes = '0' + beginWaitingMinutes;
 				if (beginWaitingSeconds < 10) beginWaitingSeconds = '0' + beginWaitingSeconds;
 				console.log('Время: ' + beginWaitingHours + ':' + beginWaitingMinutes + ':' + beginWaitingSeconds);
+                setTimeout(function(){
+                    checkForChest(activeTreasurePage, number, treasureList);
+                }, timeOfKeyFinding[number]*1000);
             } 
             else setTimeout(function() {
                 getOptimalTime(activeTreasurePage, number, treasureList);
@@ -739,35 +775,29 @@ function checkForChest(activeTreasurePage, number, treasureList) {
 	    redKeys = 0,
 	    splinters = 0;
     
-    for (var i = 0; i < keys.length; i++) {
+    for(let i = 0; i < keys.length; i++) {
         if (keys[i].style.backgroundColor == 'red') redKeys++;
         if ((keyImgs[i].src.slice(24,-4) == 621) || (keyImgs[i].src.slice(24,-4) == 620) || (keyImgs[i].src.slice(24,-4) == 623) || (keyImgs[i].src.slice(24,-4) == 622)) splinters++;
     }
     
-    if ((redKeys == 0) && (splinters == 0) && (activeTreasuresStep[number] == 4) && (activeTreasurePage[number].document.querySelector('.treasure_main_text').children[2].children[3])) {       if ((treasureWorth[number]) > minTreasure) {
-            var devided = Math.round((treasureWorth[number]/1000));
-            if (devided >= treasureList.devTimes[number]) {
-                console.warn('Сокровищница №' + treasureNumbers[number] + '. Буду грабить!');
-                activeTreasurePage[number].document.querySelector('.treasure_main_text form').children[3].click();
-                console.warn('Сокровищница №' + treasureNumbers[number] + '. Сундук удачно забран :)'); 
-                treasureList.filling[number] = false;
-                treasureList.treasuresLeft[number].innerText = 'Опустошена';
-                chests[number] = true;
-                (function(number){
-                    setTimeout(function(){
-                        activeTreasurePage[number].close();
-                    }, 2000); 
-                })(number);               
-                return true;
-            }
-            else {
-                console.warn('Сокровищница №' + treasureNumbers[number] + '. Ограбили уже ' + treasureWorth[number] + ' раз(а)! Брезгую!');
-                treasureList.diggBtn[number].innerText = 'Ну такое...';
-                activeTreasurePage[number].close();
-            }
+    if ((redKeys == 0) && (splinters == 0) && (activeTreasuresStep[number] == 4) && (activeTreasurePage[number].document.querySelector('.treasure_main_text').children[2].children[3])) {       if ((howMuch(number)) > minTreasure) {
+            console.warn('Сокровищница №' + treasureNumbers[number] + '. Решено! Буду грабить!');
+            activeTreasurePage[number].document.querySelector('.treasure_main_text form').children[3].click();
+            console.warn('Сокровищница №' + treasureNumbers[number] + '. Сундук удачно забран :)'); 
+            treasureList.diggBtn[number].innerText = 'Вскрыта!';
+            treasureList.diggBtn[number].disabled = 'true';
+            treasureList.filling[number] = false;
+            treasureList.treasuresLeft[number].innerText = 'Опустошена';
+            chests[number] = true;
+            (function(number){
+                setTimeout(function(){
+                    activeTreasurePage[number].close();
+                }, 2000); 
+            })(number);               
+            return true;
         }
         else {
-            console.warn('Сокровищница №' + treasureNumbers[number] + '. Ограбили уже ' + treasureList.devTimes[number] + ' зол.! Дешман!');
+            console.warn('Сокровищница №' + treasureNumbers[number] + '. Фактическая стоимость менее ' + minTreasure + ' зол.! Ключи дороже стоят!');
             treasureList.diggBtn[number].innerText = 'Дешман!';
             activeTreasurePage[number].close();
         }
@@ -783,6 +813,18 @@ function checkForChest(activeTreasurePage, number, treasureList) {
 		return false;
     }
 };
+
+                /* Функция расчета текущей стоимости сокры */
+
+function howMuch(number) {
+    var cost = treasureWorth[number],
+        indexNumber = treasureList.devTimes[number],
+        coeffs = [1,0.85,0.75,0.65,0.55,0.45,0.4,0.35,0.31,0.27,0.24,0.21,0.19,0.17,0.15,0.14,0.13,0.12,0.11,0.1];
+        console.log('В этой сокре будем ' + (indexNumber+1) + '-ми!');
+    var curWorth = Math.round(cost*coeffs[indexNumber]);
+    console.log('Фактическая стоимость сокры №' + treasureNumbers[number] + ': ' + curWorth + ' зол.!');
+    return curWorth;
+}
 
                 /* Создаем DOM объекты */
 
@@ -806,7 +848,10 @@ function checkForChest(activeTreasurePage, number, treasureList) {
         scriptStep = document.createElement('div'),
         panelTimer = document.createElement('div'),
         panelStartTime = document.createElement('div'),
-        panelNextStepTime = document.createElement('div');
+        panelNextStepTime = document.createElement('div'),
+        checkerWrapper = document.createElement('div'),
+        stoleCheck = document.createElement('input'),        
+        checkBoxText = document.createElement('label');
 }
 
 				/* Добавление DOM объектов на страницу */
@@ -818,22 +863,51 @@ function checkForChest(activeTreasurePage, number, treasureList) {
     wrapper.removeChild(document.querySelector('.reclama468'));
     wrapper.insertBefore(panel, navigation);
     top_brand.style = '';
-    top_brand.style.background = 'url(https://images.wallpaperscraft.ru/image/vesna_podsnezhniki_cvety_les_pervye_57379_1920x1080.jpg';
-    top_brand.style.backgroundSize = 'cover';
-    top_brand.style.height = '100vh';
+    top_brand.style.backgroundImage = 'url(http://beloweb.ru/wp-content/uploads/2014/05/1234567112.jpg)';
+    top_brand.style.height = '450vh';
+    panel.classList.add('contentWrapper');
     panel.appendChild(panelTitle);
+    panelTitle.classList.add('parserTitle');
+    panelTitle.classList.add('parserText');
     panel.appendChild(panelVersion);
+    panelVersion.classList.add('parserText');
+    panelVersion.classList.add('parserVersion');
     panel.appendChild(panelTreasures);
+    panelTreasures.classList.add('parserText');
+    panelTreasures.classList.add('parserTreasures');
+    panel.appendChild(checkerWrapper);
+    checkerWrapper.appendChild(stoleCheck);
+    stoleCheck.classList.add('parserCkeck');
+    checkerWrapper.appendChild(checkBoxText);
+    checkBoxText.classList.add('parserText');
+    checkBoxText.classList.add('parserCheckBoxText');
     panel.appendChild(emptyTreasures);
+    emptyTreasures.classList.add('parserText');
     panel.appendChild(runParse);
+    runParse.classList.add('parserButton');
+    runParse.classList.add('parserStart');
     panel.appendChild(refreshBtn);
+    refreshBtn.classList.add('parserButton');
+    refreshBtn.classList.add('parserRefresh');
     panel.appendChild(clearEmpty);
+    clearEmpty.classList.add('parserButton');
+    clearEmpty.classList.add('parserClear');
     panel.appendChild(stopParse);
+    stopParse.classList.add('parserButton');
+    stopParse.classList.add('parserStop');
     panel.appendChild(scriptIteration);
+    scriptIteration.classList.add('parserText');
     panel.appendChild(scriptStep);
+    scriptStep.classList.add('parserText');
     panel.appendChild(panelTimer);
+    panelTimer.classList.add('parserText');
+    panelTimer.classList.add('parserTimer');
     panel.appendChild(panelStartTime);
+    panelStartTime.classList.add('parserText');
+    panelStartTime.classList.add('parserTime');
     panel.appendChild(panelNextStepTime);
+    panelNextStepTime.classList.add('parserText');
+    panelNextStepTime.classList.add('parserTime');
 }
 
 				/* Стилизация DOM объектов */
@@ -842,11 +916,11 @@ function checkForChest(activeTreasurePage, number, treasureList) {
     panel.style.width = '1000px';
     panel.style.height = '';
     panel.style.paddingBottom = '15px';    
-    panel.style.background = 'linear-gradient(#e8c77b, #f1d490)';
-    panel.style.borderRadius = '5px';
-    panel.style.boxShadow = 'inset 1px 1px 0px #f1d490, 0px 2px 5px rgba(0, 0, 0, 0.5)';
+    panel.style.background = 'linear-gradient(rgba(60, 79, 212, 0.82), rgba(98, 210, 147, 0.9))';
+    panel.style.borderRadius = '85px';
+    panel.style.boxShadow = 'rgba(0, 0, 0, 0.5) 0px 2px 5px';
     "inset 1px 1px 0px #f1d490, 0px 2px 5px rgba(0, 0, 0, 0.5)";
-    panel.style.fontFamily = 'PTSansR';
+    panel.style.border = '3px solid rgba(255, 255, 255, 0.75)';
     panel.style.fontSize = '0px';
     panel.style.color = '#333';
     panelTitle.innerText = 'Авто-парсер';
@@ -861,32 +935,24 @@ function checkForChest(activeTreasurePage, number, treasureList) {
     panelVersion.style.fontSize = '14px';
     panelTreasures.style.fontSize = '16px';
     panelTreasures.style.marginTop = '0px';
-    panelTreasures.style.marginBottom = '15px';
+    panelTreasures.style.marginBottom = '5px';
     panelTreasures.style.textAlign = 'center';
     panelTreasures.innerText = 'Список сокровищниц';
     runParse.style.display = 'inline-block';
     runParse.style.margin = '5px auto 10px';
     runParse.style.marginLeft = '16.5%';
-    runParse.style.padding = '3px 8px';
-    runParse.style.fontSize = '16px';
     runParse.innerText = 'Запустить скрипт';
     refreshBtn.style.display = 'inline-block';
     refreshBtn.style.margin = '5px auto 10px';
     refreshBtn.style.marginLeft = '2%';
-    refreshBtn.style.padding = '3px 8px';
-    refreshBtn.style.fontSize = '16px';
     refreshBtn.innerText = 'Обновить информацию';
     stopParse.style.display = 'inline-block';
     stopParse.style.margin = '5px auto 10px';
     stopParse.style.marginLeft = '2%';
-    stopParse.style.padding = '3px 8px';
-    stopParse.style.fontSize = '16px';
     stopParse.innerText = 'Остановить скрипт';
     clearEmpty.style.display = 'inline-block';
     clearEmpty.style.margin = '5px auto 10px';
     clearEmpty.style.marginLeft = '2%';
-    clearEmpty.style.padding = '3px 8px';
-    clearEmpty.style.fontSize = '16px';
     clearEmpty.innerText = 'Убрать пустые';
     scriptIteration.innerText = 'Текущая итерация скрипта: 0';
     scriptIteration.style.display = 'inline-block';
@@ -915,7 +981,27 @@ function checkForChest(activeTreasurePage, number, treasureList) {
     panelNextStepTime.style.display = 'inline-block';
     panelNextStepTime.style.width = '45%';
     panelNextStepTime.style.textAlign = 'right';
-    panelNextStepTime.style.fontSize = '10px';
+    panelNextStepTime.style.fontSize = '10px';    
+    stoleCheck.type = 'checkbox';
+    stoleCheck.checked = '';
+    stoleCheck.style.marginBottom = '15px';
+    stoleCheck.style.marginLeft = '45%';
+    stoleCheck.style.verticalAlign = 'middle';
+    checkBoxText.innerText = 'автовскрытие';
+    checkBoxText.style.verticalAlign = 'middle';
+    checkBoxText.style.marginBottom = '15px';
+    checkBoxText.style.fontSize = '12px';
+    checkBoxText.style.display = 'inline-block';
+    stoleCheck.id = 'autoStolen';
+    checkBoxText.setAttribute('for', 'autoStolen');
+}
+{
+    var css = "@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap&subset=cyrillic'); .parserText {color: #fff; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: 400;} .parserTitle {font-weight: 700; font-size: 20px;}; .parserVersion {font-weight: 500; font-size: 15px;} .parserTreasures {font-weight: 500; font-size: 16px;} .parserCheckBoxText {font-weight: 300; font-size: 12px;} .parserButton {background-color: rgba(162, 37, 177, 0.66); font-family: 'Roboto', Arial, sans-serif; font-weight: 300; font-size: 14px; color: #fff; box-shadow: 0px 0px 5px rgba(0,0,0,0.8); transition: box-shadow .5s, background-color .5s; border: none; border-radius: 10px; padding: 5px 10px; outline: none;} .parserButton:hover {box-shadow: 0px 0px 8px rgba(0,0,0,0.85); background-color: rgba(177, 37, 82, 0.8);} .parserButton:disabled {background-color: rgba(30, 7, 33, 0.66);} .parserTreasureInfo {font-size: 15px; color: #fff;} .parserTreasureInfo a {transition: text-decoration: .5s; color: #fff; font-family: 'Roboto', Arial, sans-serif;} .parserTreasureInfo a:hover {text-decoration: none; color: #fff;} .diggButton {margin: 10px auto;} .parserTreasureTime {font-weight: 300; font-size: 13px;} .parserKeys {font-weight: 300; font-size: 12px}",
+    head = document.head,
+    style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+    head.appendChild(style);
 }
 
 				/* Добавление обработчиков */
@@ -939,7 +1025,7 @@ function checkForChest(activeTreasurePage, number, treasureList) {
         }
         for( var u = 0; u <= lastPage; u++) clearTimeout(timersForGifts[u]);
         firstPage = +scriptStep.innerText.match(/\d+/)[0];
-        for ( var i = firstPage; i <= lastPage; i++ ) {
+        for( let i = firstPage; i <= lastPage; i++ ) {
 		  pages[i-firstPage] = 'https://rpgtop.su/p' + i + '.html';
         }
         panelStartTime.innerText = '';
@@ -949,10 +1035,10 @@ function checkForChest(activeTreasurePage, number, treasureList) {
 }
 
                 /* Чистим консоль */
-//
-//setInterval(function(){
-//    console.clear();
-//}, 1200000);
+
+setInterval(function(){
+    console.clear();
+}, 7200000);
 
                 /* Убираем мусор топа */
 
