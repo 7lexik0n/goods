@@ -1,7 +1,7 @@
 										/* Глобальные переменные */
 {
 var iteration = 0,                     // текущая итерация скрипта
-    scriptVersion = '1.2',
+    scriptVersion = '1.3',
     minTreasure = 1500,
     treasureList = {},
 	treasureTd = 5,
@@ -562,8 +562,11 @@ function getOptimalTime(activeTreasurePage, number, treasureList) {
     
     if (!activeTreasurePage[number]) {
 		console.error('Cокровищница №' + treasureNumbers[number] + '. Такой страницы вообще нет! Критическая ошибка. Функция обрывается. ');
-        console.warn('Доработать механизм перезапуска поиска!');        
+        console.error('Cокровищница №' + treasureNumbers[number] + '. Запускается механизм перезапуска поиска ключей!');  
         activeTreasurePage[number].close();
+        setTimeout(function(){
+            firstUseOfTreasure(number);
+        }, 5000);        
 		return false;
 	}    
     if ((treasureList.filling[number] == 'nothingElse') || (!treasureList.filling[number])) {
@@ -643,11 +646,8 @@ function getOptimalTime(activeTreasurePage, number, treasureList) {
         
         setTimeout(function() {
             if (!treasurePageClones[number].document.querySelector('.treasure_vahat')) {
-                console.warn('Сокровищница №' + treasureNumbers[number] + '. Не нашел времени, скрипт продолжит работу с задержкой');
-                setTimeout(function() {
-                    findOptimalTime(treasurePageClones, activeTreasurePage, number, rpgTopVoteHref)
-                }, 15000);
-                console.log('Сокровищница №' + treasureNumbers[number] + '. setTimeout запущен');
+                console.warn('Сокровищница №' + treasureNumbers[number] + '. Не нашел времени, поиск ключей будет перезапущен!');
+                console.error('Cокровищница №' + treasureNumbers[number] + '. Запускается механизм перезапуска поиска ключей!');  
                 var beginWaitingTime = new Date();
                 var beginWaitingHours = beginWaitingTime.getHours(),
                     beginWaitingMinutes = beginWaitingTime.getMinutes(),
@@ -656,6 +656,12 @@ function getOptimalTime(activeTreasurePage, number, treasureList) {
                 if (beginWaitingMinutes < 10) beginWaitingMinutes = '0' + beginWaitingMinutes;
                 if (beginWaitingSeconds < 10) beginWaitingSeconds = '0' + beginWaitingSeconds;
                 console.log('Время: ' + beginWaitingHours + ':' + beginWaitingMinutes + ':' + beginWaitingSeconds);
+                activeTreasurePage[number].close();
+                treasurePageClones[number].close();
+                setTimeout(function(){
+                    firstUseOfTreasure(number);
+                }, 5000);        
+                return false;      
             } else {
                 console.log('Сокровищница №' + treasureNumbers[number] + '. Время найдено, всё ок');
                 findOptimalTime(treasurePageClones, activeTreasurePage, number, rpgTopVoteHref);
@@ -672,7 +678,12 @@ function getOptimalTime(activeTreasurePage, number, treasureList) {
 function findOptimalTime(treasurePageClones, activeTreasurePage, number, rpgTopVoteHref) {
     if (!treasurePageClones[number].document) {
 		console.error('Дублер сокры №' + treasureNumbers[number] + ' закрыт! Скрипт выполнен не будет');
-        console.warn('Добавить возможность перезапуска');
+        console.error('Cокровищница №' + treasureNumbers[number] + '. Запускается механизм перезапуска поиска ключей!');  
+        treasurePageClones[number].close();
+        activeTreasurePage[number].close();
+        setTimeout(function(){
+            firstUseOfTreasure(number);
+        }, 5000);        
 		return false;
 	}
     
@@ -759,8 +770,10 @@ function findOptimalTime(treasurePageClones, activeTreasurePage, number, rpgTopV
                     checkForChest(activeTreasurePage, number, treasureList);
                 }, timeOfKeyFinding[number]*1000);
             } 
-            else setTimeout(function() {
-                getOptimalTime(activeTreasurePage, number, treasureList);
+            else {
+                setTimeout(function(){
+                    getOptimalTime(activeTreasurePage, number, treasureList);
+                }, timeOfKeyFinding[number]*1000);
                 console.log('Сокровищница №' + treasureNumbers[number] + '. setTimeout установлен! Время ожидания: ' + timeOfKeyFinding[number] + ' сек.');
                 var beginWaitingTime = new Date();
                 var beginWaitingHours = beginWaitingTime.getHours(),
@@ -770,7 +783,7 @@ function findOptimalTime(treasurePageClones, activeTreasurePage, number, rpgTopV
                 if (beginWaitingMinutes < 10) beginWaitingMinutes = '0' + beginWaitingMinutes;
                 if (beginWaitingSeconds < 10) beginWaitingSeconds = '0' + beginWaitingSeconds;
                 console.log('Время: ' + beginWaitingHours + ':' + beginWaitingMinutes + ':' + beginWaitingSeconds);
-            }, timeOfKeyFinding[number]*1000);            
+            }       
             
         }, 15000);
     } else {
@@ -1129,9 +1142,9 @@ function unique(arr) {
 
                 /* Чистим консоль */
 
-setInterval(function(){
-    console.clear();
-}, 7200000);
+//setInterval(function(){
+//    console.clear();
+//}, 7200000);
 
                 /* Убираем мусор топа */
 
