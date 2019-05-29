@@ -13,7 +13,7 @@
         var n = 0;
         var giftsArray = [];
         var showChecker = 0;
-        var version = '3.1';
+        var version = '3.3';
         var siteTitle = '';
         var instWindow = 0;
         var workTime = 0;
@@ -110,20 +110,20 @@
                 }
             }
         };
-        function checkSpaun(siteID, winWork) {
+        var checkSpaun = function(siteID, winWork) {
             var spauners = winWork.document.querySelectorAll('.gift span img');
             var siteName = winWork.document.title.slice(16,-10);
             console.log('На сайте ' + siteName + ' установлено спаунеров: ' + spauners.length + ' шт.');
             if (spauners.length < 3) setSpauner(siteID, spauners.length, siteName);
         };
-        function setSpauner(siteID, spaunersNumb, siteName) {
+        var setSpauner = function(siteID, spaunersNumb, siteName) {
             var addSpauners = 3 - spaunersNumb;
             for (var i = 0; i < addSpauners; i++) {
                 spaunWindow.location.href = 'https://rpgtop.su/cgi-bin/m.cgi?a=spawns&id=' + spaunID + '&site=' + siteID + '&ver=on';
                 console.warn('На сайте ' + siteName + ' установлен спаунер!');
             }            
         }
-        function addSite(href) {
+        var addSite = function(href) {
             targetWindows[n] = href;
             giftsArray[n] = {};
             giftsArray[n].wrapper = document.createElement('div');
@@ -143,7 +143,7 @@
             n++;                                 
             workTime = targetWindows.length*12.5;
         }
-        function digg() {
+        var digg = function() {
             if (targetWindows.length > 75) {
                 console.error('ВНИМАНИЕ!');
                 console.warn('Добавлено слишком большое число страниц! Общее количество: ' + targetWindows.length + ' шт. Допустимое количество - 75 страниц.');
@@ -164,7 +164,7 @@
                 })(i);
             }
         }
-        function removeSite(number) {
+        var removeSite = function(number) {
             var num = number-1;
             targetWindows.splice(num,1);
             timersOpen.splice(num,1);
@@ -189,7 +189,7 @@
             console.warn('Все функции остановлены! Нажмите START снова!');
             workTime = targetWindows.length*12.5;
         }
-        function showAll() {
+        var showAll = function() {
             showChecker = 1;
             for(var j = 0; j < targetWindows.length; j++) {
                 var curSite = j;
@@ -212,7 +212,7 @@
                 console.log((j+1) + ': ' + targetWindows[j]);
             }
         }        
-        function showSite(n){
+        var showSite = function(n){
             var curSite = n;
             results.appendChild(giftsArray[curSite].wrapper);
             giftsArray[curSite].wrapper.appendChild(giftsArray[curSite].number);
@@ -232,7 +232,7 @@
             giftsArray[curSite].nameText.innerText = '';
             console.log((n+1) + ': ' + targetWindows[n]);
         };
-        function activateInst() {
+        var activateInst = function() {
            instActivation.location.href = instHref;
            setTimeout(function(){
               var checker = instActivation.document.querySelector('form[name="confirm"]');
@@ -240,7 +240,7 @@
               checker.querySelector('a').click();
            }, 10000);
         }
-        function checkInst() {
+        var checkInst = function() {
            if (instHref == '') {
                console.warn('Нет ссылки на инструмент! Работа будет продолжена без инструмента.');
                checkInst = function(){
@@ -262,7 +262,7 @@
               activateInst();
            }
         }   
-        function stopDigg() {
+        var stopDigg = function() {
             if (targetWindows.length > 0) {
                 for (var i = 0; i < targetWindows.length; i++) {
                     clearTimeout(timersOpen[i]);
@@ -316,7 +316,9 @@
 
     {
         logo.parentNode.removeChild(logo);
-        topBrand.style.background = 'none';
+        topBrand.style = '';
+		topBrand.style.backgroundImage = 'url(http://beloweb.ru/wp-content/uploads/2014/05/1234567112.jpg)';
+		topBrand.style.height = '450vh';
         merch1.style.display = 'none';
         merch2.style.display = 'none';
 
@@ -327,22 +329,22 @@
         wrapper.style.margin = '30px auto';
         wrapper.style.padding = '25px';
         wrapper.style.textAlign = 'center';
-        wrapper.style.background = 'linear-gradient(#e8c77b, #f1d490)';
-        wrapper.style.boxShadow = 'inset 1px 1px 0px #f1d490, 0px 2px 5px rgba(0, 0, 0, 0.5)';
-        wrapper.style.borderRadius = '5px';
+		wrapper.style.background = 'linear-gradient(rgba(60, 79, 212, 0.82), rgba(98, 210, 147, 0.9))';
+		wrapper.style.borderRadius = '85px';
+		wrapper.style.boxShadow = 'rgba(0, 0, 0, 0.5) 0px 2px 5px';
+		wrapper.style.border = '3px solid rgba(255, 255, 255, 0.75)';
+		wrapper.classList.add('contentWrapper');
     }
 
     // ---------- Заголовок ------------ //
 
     {
         wrapper.appendChild(title);
-        title.innerText = 'Digger-Master v ' + version;
-        title.style.fontFamily = 'PTSansR';
-        title.style.fontSize = '18px';
-        title.style.color = '#2c1910';
-        title.style.fontWeight = 'bold';
+        title.innerText = 'Digger-Master v ' + version;        
         title.style.textAlign = 'center';
         title.style.marginBottom = '25px';
+		title.classList.add('parserTitle');
+		title.classList.add('parserText');
     }
 
     // ---------- Ввод ссылок ------------ //
@@ -351,17 +353,11 @@
         wrapper.appendChild(area);
         area.style.display = 'block';
         area.style.margin = '10px auto';
-        area.style.border = '1px solid #482d21';
         area.style.padding = '0px 5px 0px 5px';
-        area.style.fontSize = '14px';
-        area.style.font = 'PTSansR';
-        area.style.color = '#351f16';
-        area.style.height = '40px';
-        area.style.boxShadow = 'inset -1px -1px 0px white';
-        area.style.textShadow = '0px 1px 0px white';
-        area.style.background = 'linear-gradient(#d2d2d2, #ededed)';
         area.style.textAlign = 'center';
         area.style.outline = 'none';
+		area.classList.add('parserText');
+		area.classList.add('textAreaStyle');
     }
 
     // ---------- Кнопка добавить сайты ------------ //
@@ -371,27 +367,8 @@
         but.innerText = 'Add sites';
         but.style.display = 'block';
         but.style.margin = '10px auto';
-        but.style.fontSize = '14px';
-        but.style.color = '#bca393';
-        but.style.background = 'linear-gradient(#644232, #523527)';
-        but.style.padding = '0px 15px 0px 15px';
-        but.style.border = '1px solid #482e22';
-        but.style.boxShadow = 'inset 0px 1px 0px #866555';
-        but.style.borderRadius = '5px';
-        but.style.font = 'PTSansR';
         but.style.outline = 'none';
-        but.addEventListener('mouseover', function(){
-            but.style.background = 'linear-gradient(#7b513e, #644130)';
-        });
-        but.addEventListener('mouseout', function(){
-            but.style.background = 'linear-gradient(#644232, #523527)';
-        });
-        but.addEventListener('mousedown', function(){
-            but.style.background = 'linear-gradient(#523527, #644232)';
-        });
-        but.addEventListener('mouseup', function(){
-            but.style.background = 'linear-gradient(#644232, #523527)';
-        });
+		but.classList.add('parserButton');
     }
         
     // ---------- Инпут спаунера ------------ //
@@ -401,29 +378,32 @@
         spaunerInput.style.display = 'block';
         spaunerInput.style.margin = '10px auto';
         spaunerInput.style.textAlign = 'center';
-        spaunerInput.style.border = '1px solid #482d21';
         spaunerInput.style.padding = '0px 5px 0px 5px';
-        spaunerInput.style.fontSize = '14px';
-        spaunerInput.style.font = 'PTSansR';
-        spaunerInput.style.color = '#351f16';
         spaunerInput.style.height = '23px';
-        spaunerInput.style.boxShadow = 'inset -1px -1px 0px white';
-        spaunerInput.style.textShadow = '0px 1px 0px white';
-        spaunerInput.style.background = 'linear-gradient(#d2d2d2, #ededed)';
         spaunerInput.style.width = '500px';
         spaunerInput.placeholder = 'Add spauner activation href';
         spaunerInput.style.outline = 'none';
         spaunerInput.addEventListener('change', function(){
             instHref = inst.value;
         });
+		spaunerInput.classList.add('parserText');
+		spaunerInput.classList.add('inputStyle');
     }
         
     // ---------- Чекбокс ------------ //
         
     {
         wrapper.appendChild(spaunerCheck);
+		spaunerCheck.style.verticalAlign = 'middle';
+		spaunerCheck.id = 'autoSpaun';
         wrapper.appendChild(checkBoxText);
         checkBoxText.innerText = 'Ставить спаунеры';
+		checkBoxText.style.verticalAlign = 'middle';
+		checkBoxText.style.display = 'inline-block';
+		checkBoxText.classList.add('parserText');
+		checkBoxText.classList.add('parserCheckBoxText');
+		checkBoxText.setAttribute('for', 'autoSpaun');
+		
     }    
         
     // ---------- Кнопка показать сайты ------------ //
@@ -433,27 +413,8 @@
         showBtn.innerText = 'Show all';
         showBtn.style.display = 'block';
         showBtn.style.margin = '10px auto';
-        showBtn.style.fontSize = '14px';
-        showBtn.style.color = '#bca393';
-        showBtn.style.background = 'linear-gradient(#644232, #523527)';
-        showBtn.style.padding = '0px 15px 0px 15px';
-        showBtn.style.border = '1px solid #482e22';
-        showBtn.style.boxShadow = 'inset 0px 1px 0px #866555';
-        showBtn.style.borderRadius = '5px';
-        showBtn.style.font = 'PTSansR';
         showBtn.style.outline = 'none';
-        showBtn.addEventListener('mouseover', function(){
-            showBtn.style.background = 'linear-gradient(#7b513e, #644130)';
-        });
-        showBtn.addEventListener('mouseout', function(){
-            showBtn.style.background = 'linear-gradient(#644232, #523527)';
-        });
-        showBtn.addEventListener('mousedown', function(){
-            showBtn.style.background = 'linear-gradient(#523527, #644232)';
-        });
-        showBtn.addEventListener('mouseup', function(){
-            showBtn.style.background = 'linear-gradient(#644232, #523527)';
-        });
+		showBtn.classList.add('parserButton');
     }
 
     // ---------- Кнопка стоп ------------ //
@@ -463,27 +424,8 @@
         stopBtn.innerText = 'Stop';
         stopBtn.style.display = 'block';
         stopBtn.style.margin = '10px auto';
-        stopBtn.style.fontSize = '14px';
-        stopBtn.style.color = '#bca393';
-        stopBtn.style.background = 'linear-gradient(#644232, #523527)';
-        stopBtn.style.padding = '0px 15px 0px 15px';
-        stopBtn.style.border = '1px solid #482e22';
-        stopBtn.style.boxShadow = 'inset 0px 1px 0px #866555';
-        stopBtn.style.borderRadius = '5px';
-        stopBtn.style.font = 'PTSansR';
         stopBtn.style.outline = 'none';
-        stopBtn.addEventListener('mouseover', function(){
-            stopBtn.style.background = 'linear-gradient(#7b513e, #644130)';
-        });
-        stopBtn.addEventListener('mouseout', function(){
-            stopBtn.style.background = 'linear-gradient(#644232, #523527)';
-        });
-        stopBtn.addEventListener('mousedown', function(){
-            stopBtn.style.background = 'linear-gradient(#523527, #644232)';
-        });
-        stopBtn.addEventListener('mouseup', function(){
-            stopBtn.style.background = 'linear-gradient(#644232, #523527)';
-        });
+		stopBtn.classList.add('parserButton');
     }
 
     // ---------- Инпут удаления сайта ------------ //
@@ -493,17 +435,13 @@
         clearInput.style.display = 'block';
         clearInput.style.margin = '10px auto';
         clearInput.style.textAlign = 'center';
-        clearInput.style.border = '1px solid #482d21';
         clearInput.style.padding = '0px 5px 0px 5px';
-        clearInput.style.fontSize = '14px';
-        clearInput.style.font = 'PTSansR';
-        clearInput.style.color = '#351f16';
         clearInput.style.height = '23px';
-        clearInput.style.boxShadow = 'inset -1px -1px 0px white';
-        clearInput.style.textShadow = '0px 1px 0px white';
-        clearInput.style.background = 'linear-gradient(#d2d2d2, #ededed)';
         clearInput.style.outline = 'none';
         clearInput.placeholder = 'Site number';
+		clearInput.classList.add('parserText');
+		clearInput.classList.add('inputStyle');
+		
     }
 
     // ---------- Кнопка удаления сайта ------------ //
@@ -513,27 +451,8 @@
         clearBtn.innerText = 'Remove this site';
         clearBtn.style.display = 'block';
         clearBtn.style.margin = '10px auto';
-        clearBtn.style.fontSize = '14px';
-        clearBtn.style.color = '#bca393';
-        clearBtn.style.background = 'linear-gradient(#644232, #523527)';
-        clearBtn.style.padding = '0px 15px 0px 15px';
-        clearBtn.style.border = '1px solid #482e22';
-        clearBtn.style.boxShadow = 'inset 0px 1px 0px #866555';
-        clearBtn.style.borderRadius = '5px';
-        clearBtn.style.font = 'PTSansR';
         clearBtn.style.outline = 'none';
-        clearBtn.addEventListener('mouseover', function(){
-            clearBtn.style.background = 'linear-gradient(#7b513e, #644130)';
-        });
-        clearBtn.addEventListener('mouseout', function(){
-            clearBtn.style.background = 'linear-gradient(#644232, #523527)';
-        });
-        clearBtn.addEventListener('mousedown', function(){
-            clearBtn.style.background = 'linear-gradient(#523527, #644232)';
-        });
-        clearBtn.addEventListener('mouseup', function(){
-            clearBtn.style.background = 'linear-gradient(#644232, #523527)';
-        });     
+		clearBtn.classList.add('parserButton');
     }
 
     // ---------- Инпут профиля ------------ //
@@ -543,21 +462,16 @@
         profile.style.display = 'block';
         profile.style.margin = '10px auto';
         profile.style.textAlign = 'center';
-        profile.style.border = '1px solid #482d21';
         profile.style.padding = '0px 5px 0px 5px';
-        profile.style.fontSize = '14px';
-        profile.style.font = 'PTSansR';
-        profile.style.color = '#351f16';
         profile.style.height = '23px';
-        profile.style.boxShadow = 'inset -1px -1px 0px white';
-        profile.style.textShadow = '0px 1px 0px white';
-        profile.style.background = 'linear-gradient(#d2d2d2, #ededed)';
         profile.style.width = '500px';
         profile.style.outline = 'none';
         profile.placeholder = 'Add profile href';
         profile.addEventListener('change', function(){
             profileHref = profile.value;
         });
+		profile.classList.add('parserText');
+		profile.classList.add('inputStyle');
     }
 
     // ---------- Инпут инструмента ------------ //
@@ -567,21 +481,16 @@
         inst.style.display = 'block';
         inst.style.margin = '10px auto';
         inst.style.textAlign = 'center';
-        inst.style.border = '1px solid #482d21';
         inst.style.padding = '0px 5px 0px 5px';
-        inst.style.fontSize = '14px';
-        inst.style.font = 'PTSansR';
-        inst.style.color = '#351f16';
         inst.style.height = '23px';
-        inst.style.boxShadow = 'inset -1px -1px 0px white';
-        inst.style.textShadow = '0px 1px 0px white';
-        inst.style.background = 'linear-gradient(#d2d2d2, #ededed)';
         inst.style.width = '500px';
         inst.placeholder = 'Add instrument activation href';
         inst.style.outline = 'none';
         inst.addEventListener('change', function(){
             instHref = inst.value;
         });
+		inst.classList.add('parserText');
+		inst.classList.add('inputStyle');
     }
 
     // ---------- Кнопка старта ------------ //  
@@ -591,25 +500,8 @@
         starBtn.innerText = 'Start';
         starBtn.style.display = 'block';
         starBtn.style.margin = '10px auto';
-        starBtn.style.border = '1px solid #513427';
-        starBtn.style.padding = '6px 8px 6px 8px';
-        starBtn.style.fontSize = '16px';
-        starBtn.style.font = 'PTSansR';
-        starBtn.style.color = '#eee';
         starBtn.style.outline = 'none';
-        starBtn.style.background = 'linear-gradient(#845b47, #654332)';
-        starBtn.addEventListener('mouseover', function(){
-            starBtn.style.background = 'linear-gradient(#9e6e55, #80543e)';
-        });
-        starBtn.addEventListener('mouseout', function(){
-            starBtn.style.background = 'linear-gradient(#845b47, #654332)';
-        });
-        starBtn.addEventListener('mousedown', function(){
-            starBtn.style.background = 'linear-gradient(#654332, #845b47)';
-        });
-        starBtn.addEventListener('mouseup', function(){
-            starBtn.style.background = 'linear-gradient(#845b47, #654332)';
-        });
+		starBtn.classList.add('parserButton');
     }
 
      // ---------- Блок отображения информации ------------ //    
@@ -620,9 +512,11 @@
         results.style.margin = '30px auto';
         results.style.padding = '25px';
         results.style.textAlign = 'center';
-        results.style.background = 'linear-gradient(#e8c77b, #f1d490)';
-        results.style.boxShadow = 'inset 1px 1px 0px #f1d490, 0px 2px 5px rgba(0, 0, 0, 0.5)';
-        results.style.borderRadius = '5px';
+		results.style.background = 'linear-gradient(rgba(60, 79, 212, 0.82), rgba(98, 210, 147, 0.9))';
+		results.style.borderRadius = '85px';
+		results.style.boxShadow = 'rgba(0, 0, 0, 0.5) 0px 2px 5px';
+		results.style.border = '3px solid rgba(255, 255, 255, 0.75)';
+		results.classList.add('contentWrapper');
     }
         
     }        
@@ -686,3 +580,13 @@
             showAll();
         })
     }
+	
+	// -------------- Стили ----------------- //
+	{
+    var css = "@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap&subset=cyrillic'); .parserText {color: #fff; font-family: 'Roboto', Arial, sans-serif; font-size: 14px; font-weight: 400;} .parserTitle {font-weight: 700; font-size: 20px;}; .parserVersion {font-weight: 500; font-size: 15px;} .parserTreasures {font-weight: 500; font-size: 16px;} .parserCheckBoxText {font-weight: 300; font-size: 12px;} .parserButton {padding: 10px 15px; background-color: rgba(162, 37, 177, 0.66); font-family: 'Roboto', Arial, sans-serif; font-weight: 300; font-size: 14px; color: #fff; box-shadow: 0px 0px 5px rgba(0,0,0,0.8); transition: box-shadow .5s, background-color .5s; border: none; border-radius: 10px; outline: none;} .parserButton:hover {box-shadow: 0px 0px 8px rgba(0,0,0,0.85); background-color: rgba(177, 37, 82, 0.8);} .parserButton:disabled {background-color: rgba(30, 7, 33, 0.66);} .parserTreasureInfo {font-size: 15px; color: #fff;} .parserTreasureInfo a {transition: text-decoration: .5s; color: #fff; font-family: 'Roboto', Arial, sans-serif;} .parserTreasureInfo a:hover {text-decoration: none; color: #fff;} .diggButton {margin: 10px auto;} .parserTreasureTime {font-weight: 300; font-size: 13px;} .parserKeys {font-weight: 300; font-size: 12px} .textAreaStyle {border-radius: 15px; border: 1px solid #fff; font-size: 14px; color: #fff; text-shadow: none; background: transparent; min-height: 160px; box-shadow: inset 0px 0px 25px rgba(4, 8, 72, 0.65);} .inputStyle {border-radius: 15px; border: 1px solid #fff; font-size: 14px; color: #fff; text-shadow: none; background: transparent; min-height: 25px; box-shadow: inset 0px 0px 10px rgba(4, 8, 72, 0.65);} .inputStyle::-webkit-input-placeholder {color: #fff;} .inputStyle::placeholder {color: #fff;} .contentWrapper p {color: #fff; font-family: 'Roboto', Arial, sans-serif;} .contentWrapper a {color: #fff; font-family: 'Roboto', Arial, sans-serif;}",
+    head = document.head,
+    style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+    head.appendChild(style);
+}
