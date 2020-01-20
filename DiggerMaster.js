@@ -13,7 +13,7 @@
         var n = 0;
         var giftsArray = [];
         var showChecker = 0;
-        var version = '3.3';
+        var version = '3.3.1';
         var siteTitle = '';
         var instWindow = 0;
         var workTime = 0;
@@ -285,7 +285,7 @@
     {
         var container = document.querySelector('.container');
         var topBrand = document.querySelector('#top_brand');
-        var merch1 = document.querySelector('.android');
+        // var merch1 = document.querySelector('.android');
         var merch2 = document.querySelector('.reclama468');
         var nav = container.querySelector('#nav_bar');
         var but = document.createElement('button');
@@ -319,7 +319,7 @@
         topBrand.style = '';
 		topBrand.style.backgroundImage = 'url(http://beloweb.ru/wp-content/uploads/2014/05/1234567112.jpg)';
 		topBrand.style.height = '450vh';
-        merch1.style.display = 'none';
+        // merch1.style.display = 'none';
         merch2.style.display = 'none';
 
         container.insertBefore(wrapper, nav);
