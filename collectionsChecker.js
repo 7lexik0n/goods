@@ -7,7 +7,9 @@ for (let i = 0; i < collectionBlocks.length - 1; i++) {
 	var itemBlocks = collectionBlocks[i].querySelectorAll('.gift');
 	var count = 0;
 	for (let j = 0; j < itemBlocks.length; j++) {		
-		var name = itemBlocks[j].children[0].children[0].alt;
+//		var name = itemBlocks[j].children[0].children[0].alt;
+		tmp = itemBlocks[j].children[0].children[0].getAttribute('src');		
+		var name = tmp.slice(7,tmp.length-4);
 		if (itemBlocks[j].children[0].tagName != 'A') {
 			var success = '+';
 			count++;
