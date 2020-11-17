@@ -37,77 +37,95 @@
 
     {
         var findGifts = function(winWork, curSite) {
-            if (showChecker == 0) showAll();
-            giftsArray[curSite].numberText.innerText = curSite+1;
-            giftsArray[curSite].hrefText.innerText = targetWindows[curSite];
-            giftsArray[curSite].nameText.innerText = winWork.document.title.slice(16,-10);
-            giftsArray[curSite].nameText.style.textIndent = '10px';
-            if ((winWork.document)&&(winWork.document.body)) {
-                var gifts = winWork.document.body.querySelectorAll('.gift a'),
-                    giftImgs = winWork.document.body.querySelectorAll('.gift img');
-                var siteID = winWork.location.href.match(/\d+/)[0];
-                if (masterMode == 1) {
-                    checkSpaun(siteID, winWork);
-                }                
-            } 
-            else {
-                console.warn('Загрузка страницы не успела завершиться до начала работы скрипта! Во избежание поломки работы скрипта данная страница будет опущена.');
-                return false;
-            }
-            for (var key in giftsArray[curSite].giftsCount) {
-                giftsArray[curSite].wrapper.removeChild(giftsArray[curSite].giftsCount[key].wrapper);
-            }
-            giftsArray[curSite].giftsCount = {};
-            for (var i = 0; i < giftImgs.length; i++) {
-                (function(i){
-                        if (giftImgs[i].alt != '')	{
-                            console.log(giftImgs[i].alt);
-                            var giftBox = giftImgs[i].alt,
-                                giftName = giftImgs[i].alt;
-                            if (giftsArray[curSite].giftsCount[giftBox]) {
-                                giftsArray[curSite].giftsCount[giftBox][giftName]++;
-                                giftsArray[curSite].giftsCount[giftBox].wrapper.innerText = giftName + ': ' + giftsArray[curSite].giftsCount[giftBox][giftName];
-                            } else {
-                                giftsArray[curSite].giftsCount[giftBox] = {};  
-                                giftsArray[curSite].giftsCount[giftBox].wrapper = document.createElement('p');
-                                giftsArray[curSite].giftsCount[giftBox].wrapper.style.textIndent = '0px';
-                                giftsArray[curSite].giftsCount[giftBox].wrapper.style.width = '100%';
-                                giftsArray[curSite].giftsCount[giftBox].wrapper.style.textAlign = 'center';
-                                giftsArray[curSite].wrapper.appendChild(giftsArray[curSite].giftsCount[giftBox].wrapper);
-                                giftsArray[curSite].giftsCount[giftBox][giftName] = 1;                               
-                                giftsArray[curSite].giftsCount[giftBox].wrapper.innerText = giftName + ': ' + giftsArray[curSite].giftsCount[giftBox][giftName];
-                            }
-                        }
-                })(i);
-            }
-            if (gifts.length != 0) {
-                console.log('Сайт ' + winWork.document.title.slice(16,-10));
-                for (var k = 0; k < gifts.length; k++) {
-                    (function(k){
-                        if (k == 0) {
-                            gifts[k].click();
-                            console.warn('Собран 1-й предмет: ' + gifts[k].children[0].alt + ' на сайте ' + winWork.document.title.slice(16,-10));
-                        }
-                        else {
-                            if (k < 10) {
-                                if ((winWork.document) && (winWork.document.body)) {
-                                    setTimeout(function(){
-                                        winWork.document.body.appendChild(gifts[k]);
-                                        console.log('Добавлен ' + (k+1) + ' предмет: ' + gifts[k].children[0].alt);
-                                    }, 900*k);
-                                    setTimeout(function(){
-                                        gifts[k].click();
-                                        console.warn('Собран ' + (k+1) + ' предмет: ' + gifts[k].children[0].alt);
-                                    }, 900*k+20); 
-                                } else {
-                                    console.log('Загрузка страницы не успела за скриптом!. Предмет будет пропущен во избежание нарушений работы скрипта.');
-                                }
-                            } else {
-                                console.log('Переполнение стэка на сайте ' + winWork.document.title.slice(16,-10) + '. ' + gifts[k].children[0].alt + ' будет подобран при следующем проходе');
-                            }
-                        }
-                    })(k);
+            try {
+                if (showChecker == 0) showAll();
+                giftsArray[curSite].numberText.innerText = curSite+1;
+                giftsArray[curSite].hrefText.innerText = targetWindows[curSite];
+                giftsArray[curSite].nameText.innerText = winWork.document.title.slice(16,-10);
+                giftsArray[curSite].nameText.style.textIndent = '10px';
+                if ((winWork.document)&&(winWork.document.body)) {
+                    var gifts = winWork.document.body.querySelectorAll('.gift a'),
+                        giftImgs = winWork.document.body.querySelectorAll('.gift img');
+                    try {
+                        var siteID = winWork.location.href.match(/\d+/)[0];
+                    }
+                    catch(error) {
+                        console.warn('Отловлена критическая ошибка! Собираем данные...');
+                        console.error(error);
+                        console.log('winWork', winwork);
+                        console.log('cursite', cursite);
+                        console.log('targetWindows', targetWindows);
+                    }
+                    if (masterMode == 1) {
+                        checkSpaun(siteID, winWork);
+                    }                
+                } 
+                else {
+                    console.warn('Загрузка страницы не успела завершиться до начала работы скрипта! Во избежание поломки работы скрипта данная страница будет опущена.');
+                    return false;
                 }
+                for (var key in giftsArray[curSite].giftsCount) {
+                    giftsArray[curSite].wrapper.removeChild(giftsArray[curSite].giftsCount[key].wrapper);
+                }
+                giftsArray[curSite].giftsCount = {};
+                for (var i = 0; i < giftImgs.length; i++) {
+                    (function(i){
+                            if (giftImgs[i].alt != '')	{
+                                console.log(giftImgs[i].alt);
+                                var giftBox = giftImgs[i].alt,
+                                    giftName = giftImgs[i].alt;
+                                if (giftsArray[curSite].giftsCount[giftBox]) {
+                                    giftsArray[curSite].giftsCount[giftBox][giftName]++;
+                                    giftsArray[curSite].giftsCount[giftBox].wrapper.innerText = giftName + ': ' + giftsArray[curSite].giftsCount[giftBox][giftName];
+                                } else {
+                                    giftsArray[curSite].giftsCount[giftBox] = {};  
+                                    giftsArray[curSite].giftsCount[giftBox].wrapper = document.createElement('p');
+                                    giftsArray[curSite].giftsCount[giftBox].wrapper.style.textIndent = '0px';
+                                    giftsArray[curSite].giftsCount[giftBox].wrapper.style.width = '100%';
+                                    giftsArray[curSite].giftsCount[giftBox].wrapper.style.textAlign = 'center';
+                                    giftsArray[curSite].wrapper.appendChild(giftsArray[curSite].giftsCount[giftBox].wrapper);
+                                    giftsArray[curSite].giftsCount[giftBox][giftName] = 1;                               
+                                    giftsArray[curSite].giftsCount[giftBox].wrapper.innerText = giftName + ': ' + giftsArray[curSite].giftsCount[giftBox][giftName];
+                                }
+                            }
+                    })(i);
+                }
+                if (gifts.length != 0) {
+                    console.log('Сайт ' + winWork.document.title.slice(16,-10));
+                    for (var k = 0; k < gifts.length; k++) {
+                        (function(k){
+                            if (k == 0) {
+                                gifts[k].click();
+                                console.warn('Собран 1-й предмет: ' + gifts[k].children[0].alt + ' на сайте ' + winWork.document.title.slice(16,-10));
+                            }
+                            else {
+                                if (k < 10) {
+                                    if ((winWork.document) && (winWork.document.body)) {
+                                        setTimeout(function(){
+                                            winWork.document.body.appendChild(gifts[k]);
+                                            console.log('Добавлен ' + (k+1) + ' предмет: ' + gifts[k].children[0].alt);
+                                        }, 900*k);
+                                        setTimeout(function(){
+                                            gifts[k].click();
+                                            console.warn('Собран ' + (k+1) + ' предмет: ' + gifts[k].children[0].alt);
+                                        }, 900*k+20); 
+                                    } else {
+                                        console.log('Загрузка страницы не успела за скриптом!. Предмет будет пропущен во избежание нарушений работы скрипта.');
+                                    }
+                                } else {
+                                    console.log('Переполнение стэка на сайте ' + winWork.document.title.slice(16,-10) + '. ' + gifts[k].children[0].alt + ' будет подобран при следующем проходе');
+                                }
+                            }
+                        })(k);
+                    }
+                }
+            }
+            catch(e) {
+                console.warn('Отловлена критическая ошибка! Собираем данные...');
+                console.error(e);
+                console.log('winWork', winwork);
+                console.log('cursite', cursite);
+                console.log('targetWindows', targetWindows);
             }
         };
         var checkSpaun = function(siteID, winWork) {
@@ -159,7 +177,16 @@
                     timersFind[i] = setTimeout(function(curSite){
                         console.log('Открыт сайт ' + giftWindow.document.title.slice(16,-10));
                         siteTitle = giftWindow.document.title.slice(16,-10);
-                        findGifts(giftWindow, i);
+                        try {
+                            findGifts(giftWindow, i);
+                        }
+                        catch(e) {
+                            console.warn('Отловлена критическая ошибка! Собираем данные...');
+                            console.error(e);
+                            console.log('giftWindow', giftWindow);
+                            console.log('i', i);
+                            console.log('targetWindows', targetWindows);
+                        }
                     }, 12500*i+2000);
                 })(i);
             }
@@ -317,7 +344,7 @@
     {
         logo.parentNode.removeChild(logo);
         topBrand.style = '';
-		topBrand.style.backgroundImage = 'url(http://beloweb.ru/wp-content/uploads/2014/05/1234567112.jpg)';
+		// topBrand.style.backgroundImage = 'url(http://beloweb.ru/wp-content/uploads/2014/05/1234567112.jpg)';
 		topBrand.style.height = '450vh';
         // merch1.style.display = 'none';
         merch2.style.display = 'none';
