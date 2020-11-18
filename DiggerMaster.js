@@ -175,6 +175,15 @@
                         catch(e) {
                             stopDigg();
                             console.warn('Внимание! Все функции остановлены! Цикл запускается заново!');
+                            i = 0;
+                            giftWindow.close();
+                            giftWindow = window.open('https://rpgtop.su', 'popup2', 'width=64,height=48');
+                            giftWindow.moveTo(0,1050);
+                            giftWindow.resizeTo(0,0);
+                            instActivation.close();
+                            instActivation = window.open('https://rpgtop.su', 'popup1', 'width=64,height=48');
+                            instActivation.moveTo(0,1050);
+                            instActivation.resizeTo(0,0);
                             workTime = targetWindows.length*12.5;
                             starBtn.click();
                         }
