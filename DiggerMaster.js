@@ -51,10 +51,10 @@
                     }
                     catch(error) {
                         console.warn('Отловлена критическая ошибка! Собираем данные...');
-                        console.error(error);
                         console.log('winWork', winwork);
                         console.log('cursite', cursite);
                         console.log('targetWindows', targetWindows);
+                        console.error(error);
                     }
                     if (masterMode == 1) {
                         checkSpaun(siteID, winWork);
@@ -122,10 +122,10 @@
             }
             catch(e) {
                 console.warn('Отловлена критическая ошибка! Собираем данные...');
-                console.error(e);
                 console.log('winWork', winwork);
                 console.log('cursite', cursite);
                 console.log('targetWindows', targetWindows);
+                console.warn(e);
             }
         };
         var checkSpaun = function(siteID, winWork) {
@@ -182,10 +182,10 @@
                         }
                         catch(e) {
                             console.warn('Отловлена критическая ошибка! Собираем данные...');
-                            console.error(e);
                             console.log('giftWindow', giftWindow);
                             console.log('i', i);
                             console.log('targetWindows', targetWindows);
+                            console.warn(e);
                         }
                     }, 12500*i+2000);
                 })(i);
