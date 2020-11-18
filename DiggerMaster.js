@@ -13,7 +13,7 @@
         var n = 0;
         var giftsArray = [];
         var showChecker = 0;
-        var version = '3.3.2-3b';
+        var version = '3.3.2-4b';
         var siteTitle = '';
         var instWindow = 0;
         var workTime = 0;
@@ -179,13 +179,21 @@
                             console.warn('Внимание! Все функции остановлены! Цикл запускается заново!');
                             i = 0;
                             giftWindow.close();
-                            giftWindow = window.open('https://rpgtop.su', 'popup2', 'width=64,height=48');
-                            giftWindow.moveTo(0,1050);
-                            giftWindow.resizeTo(0,0);
+                            if (giftWindow.closed) {
+                                giftWindow = window.open('https://rpgtop.su', 'popup2', 'width=64,height=48');
+                                giftWindow.moveTo(0,1050);
+                                giftWindow.resizeTo(0,0);
+                            } else {
+                                giftWindow.location.href = 'https://rpgtop.su';
+                            }                  
                             instActivation.close();
-                            instActivation = window.open('https://rpgtop.su', 'popup1', 'width=64,height=48');
-                            instActivation.moveTo(0,1050);
-                            instActivation.resizeTo(0,0);
+                            if (instActivation.closed) {
+                                instActivation = window.open('https://rpgtop.su', 'popup1', 'width=64,height=48');
+                                instActivation.moveTo(0,1050);
+                                instActivation.resizeTo(0,0);
+                            } else {
+                                instActivation.location.href = 'https://rpgtop.su';
+                            }
                             workTime = targetWindows.length*12.5;
                             starBtn.click();
                         }
