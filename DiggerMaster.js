@@ -13,7 +13,7 @@
         var n = 0;
         var giftsArray = [];
         var showChecker = 0;
-        var version = '3.3.2-2b';
+        var version = '3.3.2-3b';
         var siteTitle = '';
         var instWindow = 0;
         var workTime = 0;
@@ -50,7 +50,7 @@
                         var siteID = winWork.location.href.match(/\d+/)[0];
                     }
                     catch(error) {
-                        console.error('Критическая ошибка: потеря контекста рабочего окна');
+                        throw new Error('Критическая ошибка: потеря контекста рабочего окна');
                     }
                     if (masterMode == 1) {
                         checkSpaun(siteID, winWork);
@@ -117,7 +117,8 @@
                 }
             }
             catch(e) {
-                console.error('Скрипт не может продолжать работу. Цикл будет перезапущен');
+                console.warn(e.message);
+                throw new Error('Скрипт не может продолжать работу. Цикл будет перезапущен');
             }
         };
         var checkSpaun = function(siteID, winWork) {
@@ -173,6 +174,7 @@
                             findGifts(giftWindow, i);
                         }
                         catch(e) {
+                            console.warn(e.message);
                             stopDigg();
                             console.warn('Внимание! Все функции остановлены! Цикл запускается заново!');
                             i = 0;
