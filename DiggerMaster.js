@@ -13,7 +13,7 @@
         var n = 0;
         var giftsArray = [];
         var showChecker = 0;
-        var version = '3.3.2';
+        var version = '3.3.2-1b';
         var siteTitle = '';
         var instWindow = 0;
         var workTime = 0;
