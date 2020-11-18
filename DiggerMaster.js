@@ -13,7 +13,7 @@
         var n = 0;
         var giftsArray = [];
         var showChecker = 0;
-        var version = '3.3.1';
+        var version = '3.3.2';
         var siteTitle = '';
         var instWindow = 0;
         var workTime = 0;
@@ -50,11 +50,7 @@
                         var siteID = winWork.location.href.match(/\d+/)[0];
                     }
                     catch(error) {
-                        console.warn('Отловлена критическая ошибка! Собираем данные...');
-                        console.log('winWork', winwork);
-                        console.log('cursite', cursite);
-                        console.log('targetWindows', targetWindows);
-                        console.error(error);
+                        console.error('Критическая ошибка: потеря контекста рабочего окна');
                     }
                     if (masterMode == 1) {
                         checkSpaun(siteID, winWork);
@@ -121,11 +117,7 @@
                 }
             }
             catch(e) {
-                console.warn('Отловлена критическая ошибка! Собираем данные...');
-                console.log('winWork', winwork);
-                console.log('cursite', cursite);
-                console.log('targetWindows', targetWindows);
-                console.warn(e);
+                console.error('Скрипт не может продолжать работу. Цикл будет перезапущен');
             }
         };
         var checkSpaun = function(siteID, winWork) {
@@ -181,11 +173,10 @@
                             findGifts(giftWindow, i);
                         }
                         catch(e) {
-                            console.warn('Отловлена критическая ошибка! Собираем данные...');
-                            console.log('giftWindow', giftWindow);
-                            console.log('i', i);
-                            console.log('targetWindows', targetWindows);
-                            console.warn(e);
+                            stopDigg();
+                            console.warn('Внимание! Все функции остановлены! Цикл запускается заново!');
+                            workTime = targetWindows.length*12.5;
+                            starBtn.click();
                         }
                     }, 12500*i+2000);
                 })(i);
