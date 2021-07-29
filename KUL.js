@@ -123,7 +123,7 @@
             max: pages.length
         })
         return Promise.all(pages.map(async(item,index,arr) => {
-            const sites = await loadAnchor('/p'+index+'.html','.comments a')
+            const sites = await loadAnchor('/p'+item+'.html','.comments a')
             const links = await getLinks(sites)
             loader.status = index + 1
 
@@ -169,12 +169,12 @@
                         $('.bod .gifts:last-child').append(`<div class="giftBlock"></div>`)
                         $('.giftBlock:last-child').append(el.gift[num])
                         if (el.gift[num].children[0].alt) {
-                            var name = el.gift[num].children[0].src.slice(24,-4)
+                            var id = el.gift[num].children[0].src.slice(24,-4)
                             var val = el.gift[num].children[1].innerHTML
-                            $('.giftBlock:last-child').append(`<p>${name} [${val} шт.]</p>`)
+                            $('.giftBlock:last-child').append(`<p>${id} [${val} шт.]</p>`)
                             var adress = el.link
                             $('.giftBlock:last-child').append(`<a href="${adress}">ССЫЛКА</a>`)
-                            finalArr.push(adress)                      
+                            finalArr.push({id, adress})                      
                         }
                         else {
                             var name = el.gift[num].children[0].children[0].alt
@@ -187,13 +187,12 @@
                 }                
             }
         })
-        finalArr = unique(finalArr)
+        finalArr = unique(finalArr.map((item) => item.adress))
         finalTres = unique(finalTres)
-        console.log(finalArr)
         $('.bod .gifts:last-child').append(`<hr>`)
         $('.bod .gifts:last-child').append(`ПРЕДМЕТЫ`)
-        finalArr.forEach(function(el){
-            $('.bod .gifts:last-child').append(`<p><a href="${el}">${el}</a></p>`)
+        finalArr.forEach(function(adress){
+            $('.bod .gifts:last-child').append(`<p><a href="${adress}">${adress}</a></p>`)
         })
         $('.bod .gifts:last-child').append(`<hr>`)
         $('.bod .gifts:last-child').append(`СОКРЫ`)
@@ -204,11 +203,16 @@
 
     const main = async() => {
         clean()
-        const lastPage = 5
-        const pages = new Array(lastPage).fill(1)
+        const firstPage = 1
+        const lastPage = 10
+        const pages = createPagesArray(firstPage, lastPage)
         const links = flatten(await getSites(pages))
         const fullGifts = filterGifts(await getGifts(links))
         displayGifts(fullGifts)
+    }
+
+    const createPagesArray = (firstPage, lastPage) => {
+        return [...new Array(lastPage - firstPage + 1)].map((_, index) => firstPage + index);
     }
     
     function unique(arr) {
