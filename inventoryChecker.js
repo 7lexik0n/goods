@@ -5,7 +5,9 @@ mainPage.insertBefore(table, firstGift);
 let giftBlocks = document.querySelectorAll('.gift');
 var itemList = {};
 for (let i = 0; i < giftBlocks.length; i++) {
-	let name = giftBlocks[i].getAttribute('data-title');	
+//	let name = giftBlocks[i].getAttribute('data-title');	
+	tmp = giftBlocks[i].firstElementChild.firstElementChild.getAttribute('src');
+	let name = tmp.slice(7,tmp.length-4);
 	let number = giftBlocks[i].querySelector('.num').innerText;	
 	itemList[name] = number;
 }
